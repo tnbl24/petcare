@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="user/fragment/head :: head"></head>
+
+<script th:src="@{/user/controller/index-ctrl.js}"></script>
+
+<style>
+    body {
+        background: linear-gradient(90deg, rgba(232, 243, 255, 1) 0%, rgba(215, 242, 250, 1) 51%, rgba(214, 247, 236, 0.6) 100%);
+    }
+</style>
+<body>
+<div th:replace="user/fragment/navbar :: navbar"></div>
+
+<!-- Giờ làm việc Start -->
+<div class="container-fluid service py-5">
+    <div class="container service-section py-5">
+        <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.2s" style="max-width: 800px;">
+            <h1 class="display-5 text-white mb-4">Giờ làm việc</h1>
+        </div>
+        <div class="row g-4">
+            <div class="col-0 col-md-1 col-lg-2 col-xl-2"></div>
+            <div class="col-md-10 col-lg-8 col-xl-8 wow fadeInUp" data-wow-delay="0.2s">
+                <div class="service-days p-4">
+                    <div class="py-2 border-bottom border-top d-flex align-items-center justify-content-between flex-wrap">
+                        <h4 class="mb-0 pb-2 pb-sm-0">Monday - Friday</h4>
+                        <p class="mb-0"><i class="fas fa-clock text-primary me-2"></i>11:00 AM - 16:00 PM</p></div>
+                    <div class="py-2 border-bottom d-flex align-items-center justify-content-between flex-shrink-1 flex-wrap">
+                        <h4 class="mb-0 pb-2 pb-sm-0">Saturday - Sunday</h4>
+                        <p class="mb-0"><i class="fas fa-clock text-primary me-2"></i>09:00 AM - 17:00 PM</p></div>
+                    <div class="py-2 border-bottom d-flex align-items-center justify-content-between flex-shrink-1 flex-wrap">
+                        <h4 class="mb-0">Holiday</h4>
+                        <p class="mb-0"><i class="fas fa-clock text-primary me-2"></i>09:00 AM - 17:00 PM</p></div>
+                </div>
+            </div>
+            <div class="col-0 col-md-1 col-lg-2 col-xl-2"></div>
+
+        </div>
+    </div>
+</div>
+<!-- Service End -->
+
+<!-- About Start -->
+<div class="container-fluid about ">
+    <div class="container py-5">
+        <div class="row g-5">
+            <div class="col-xl-6 wow fadeInUp" data-wow-delay="0.2s">
+                <div>
+                    <h1 class="display-5 mb-4">Cửa hàng cung cấp dịch vụ tốt nhất</h1>
+                    <!--                    <p class="mb-5">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Facilis eligendi illum-->
+                    <!--                        inventore maiores incidunt vero id. Est ipsam, distinctio veritatis earum inventore ab fugit-->
+                    <!--                        officiis ut ullam, laudantium facere sapiente?-->
+                    <!--                    </p>-->
+                </div>
+            </div>
+            <div class="col-xl-6 wow fadeInUp" data-wow-delay="0.4s">
+                <div class="position-relative rounded">
+                    <div class="rounded" style="margin-top: 40px;">
+                        <div class="row g-0">
+                            <div class="col-lg-12">
+                                <div class="rounded mb-4">
+                                    <img src="img/about.jpg" class="img-fluid rounded w-100" alt="">
+                                </div>
+                                <div class="row gx-4 gy-0">
+                                    <div class="col-6">
+                                        <div class="counter-item bg-primary rounded text-center p-4 h-100">
+                                            <div class="counter-item-icon mx-auto mb-3">
+                                                <i class="fas fa-thumbs-up fa-3x text-white"></i>
+                                            </div>
+                                            <div class="counter-counting mb-3">
+                                                <span class="text-white fs-2 fw-bold"
+                                                      data-toggle="counter-up">150</span>
+                                                <span class="h1 fw-bold text-white">K +</span>
+                                            </div>
+                                            <h5 class="text-white mb-0">Khách hàng</h5>
+                                        </div>
+                                    </div>
+                                    <div class="col-6">
+                                        <div class="counter-item bg-dark rounded text-center p-4 h-100">
+                                            <div class="counter-item-icon mx-auto mb-3">
+                                                <i class="fas fa-certificate fa-3x text-white"></i>
+                                            </div>
+                                            <div class="counter-counting mb-3">
+                                                <span class="text-white fs-2 fw-bold"
+                                                      data-toggle="counter-up">122</span>
+                                                <span class="h1 fw-bold text-white"> +</span>
+                                            </div>
+                                            <h5 class="text-white mb-0">Dịch vụ</h5>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="rounded bg-primary p-4 position-absolute d-flex justify-content-center"
+                         style="width: 90%; height: 80px; top: -40px; left: 50%; transform: translateX(-50%);">
+                        <h3 class="mb-0 text-white">20 Năm Kinh Nghiệm</h3>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- About End -->
+
+
+<!-- Gallery Start -->
+<div class="container-fluid gallery pb-5">
+    <div class="container pb-5">
+        <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.2s" style="max-width: 800px;">
+            <h1 class="display-5 mb-4">Hình ảnh</h1>
+        </div>
+        <div class="row g-4">
+            <div class="col-md-4 wow fadeInUp" data-wow-delay="0.2s">
+                <div class="gallery-item">
+                    <img th:src="@{https://images.stockcake.com/public/a/b/9/ab95a896-b393-40a9-8045-1d04d38f3698_large/puppy-s-medical-checkup-stockcake.jpg}" class="img-fluid rounded w-100 h-100" alt="">
+                    <div class="search-icon">
+                        <a th:href="@{https://images.stockcake.com/public/a/b/9/ab95a896-b393-40a9-8045-1d04d38f3698_large/puppy-s-medical-checkup-stockcake.jpg}" class="btn btn-light btn-lg-square rounded-circle"
+                           data-lightbox="Gallery-1"><i class="fas fa-search-plus"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 wow fadeInUp" data-wow-delay="0.4s">
+                <div class="gallery-item">
+                    <img th:src="@{https://bizweb.dktcdn.net/100/458/454/themes/869149/assets/img_spa_2.jpg?1728461339224}" class="img-fluid rounded w-100 h-100" alt="">
+                    <div class="search-icon">
+                        <a th:href="@{https://bizweb.dktcdn.net/100/458/454/themes/869149/assets/img_spa_2.jpg?1728461339224}" class="btn btn-light btn-lg-square rounded-circle"
+                           data-lightbox="Gallery-2"><i class="fas fa-search-plus"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
+                <div class="gallery-item">
+                    <img th:src="@{https://bizweb.dktcdn.net/100/458/454/themes/869149/assets/img_spa_3.jpg?1728461339224}" class="img-fluid rounded w-100 h-100" alt="">
+                    <div class="search-icon">
+                        <a th:href="@{https://bizweb.dktcdn.net/100/458/454/themes/869149/assets/img_spa_3.jpg?1728461339224}" class="btn btn-light btn-lg-square rounded-circle"
+                           data-lightbox="Gallery-3"><i class="fas fa-search-plus"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 wow fadeInUp" data-wow-delay="0.2s">
+                <div class="gallery-item">
+                    <img th:src="@{https://img1.wsimg.com/isteam/ip/5484e2de-15b1-489e-95d5-2e80f0a7b41c/fb_5011265872258629_1822x2048-0001.jpg/:/rs=w:388,cg:true,m}" class="img-fluid rounded w-100 h-100" alt="">
+                    <div class="search-icon">
+                        <a th:href="@{https://img1.wsimg.com/isteam/ip/5484e2de-15b1-489e-95d5-2e80f0a7b41c/fb_5011265872258629_1822x2048-0001.jpg/:/rs=w:388,cg:true,m}" class="btn btn-light btn-lg-square rounded-circle"
+                           data-lightbox="Gallery-4"><i class="fas fa-search-plus"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 wow fadeInUp" data-wow-delay="0.4s">
+                <div class="gallery-item">
+                    <img th:src="@{https://www.oaksedgefarmdoghotel.co.uk/uploads/2/2/4/6/22461646/18319334-10155143323729627-6032891000526976588-o_4_orig.jpg}" class="img-fluid rounded w-100 h-100" alt="">
+                    <div class="search-icon">
+                        <a th:href="@{https://www.oaksedgefarmdoghotel.co.uk/uploads/2/2/4/6/22461646/18319334-10155143323729627-6032891000526976588-o_4_orig.jpg}" class="btn btn-light btn-lg-square rounded-circle"
+                           data-lightbox="Gallery-5"><i class="fas fa-search-plus"></i></a>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4 wow fadeInUp" data-wow-delay="0.6s">
+                <div class="gallery-item">
+                    <img th:src="@{https://bizweb.dktcdn.net/100/458/454/themes/869149/assets/img_spa_6.jpg?1728461339224}" class="img-fluid rounded w-100 h-100" alt="">
+                    <div class="search-icon">
+                        <a th:href="@{https://bizweb.dktcdn.net/100/458/454/themes/869149/assets/img_spa_6.jpg?1728461339224}" class="btn btn-light btn-lg-square rounded-circle"
+                           data-lightbox="Gallery-6">
+                            <i class="fas fa-search-plus">
+                            </i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="col-12 wow fadeInUp" data-wow-delay="0.2s">
+    <div class="rounded">
+        <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3724.7335946191274!2d105.84074577512844!3d21.003313480639655!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3135ac773026b415%3A0x499b8b613889f78a!2zVHLGsOG7nW5nIMSQ4bqhaSBI4buNYyBYw6J5IEThu7FuZyBIw6AgTuG7mWkgLSBIVUNF!5e0!3m2!1svi!2s!4v1730290406690!5m2!1svi!2s"
+                width="600"
+                height="450"
+                style="border:0;"
+                class="rounded w-100"
+                allowfullscreen=""
+                loading="lazy"
+                referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+</div>
+
+
+<footer th:replace="user/fragment/footer :: footer"></footer>
+
+<!-- JavaScript Libraries -->
+<div th:replace="user/fragment/script :: script"></div>
+
+
+</body>
+
+</html>

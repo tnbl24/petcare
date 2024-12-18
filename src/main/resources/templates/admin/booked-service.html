@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="admin/fragment/head :: head"></head>
+
+<script th:src="@{/admin/controller/booked-service-ctrl.js}"></script>
+<script th:src="@{/admin/controller/callender.js}"></script>
+<style>
+    .modal-body {
+        max-height: 500px; /* Đặt chiều cao tối đa cho modal body */
+        overflow-y: auto; /* Kích hoạt cuộn dọc */
+    }
+
+    .card-img-top {
+        width: 100px;
+        height: 100px;
+        margin-left: 1.5rem;
+        border-radius: 0.267rem;
+    }
+
+    .pet {
+        display: flex;
+    }
+
+    .card-body2 {
+        padding: 0;
+        margin-left: 1rem;
+    }
+
+    .pet p {
+        margin: 0;
+    }
+    .card .card-body {
+        padding: 1.4rem 1.7rem;
+        padding-top: 0;
+    }
+    .status-circle {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white; /* Màu chữ */
+        font-weight: bold;
+    }
+</style>
+<body>
+<div id="app">
+    <div th:replace="admin/fragment/sidebar :: sidebar"></div>
+    <div id="main">
+        <div th:replace="admin/fragment/navbar :: navbar"></div>
+        <div class="main-content container-fluid">
+            <div class="page-title">
+                <div class="row">
+                    <div class="col-12 col-md-6 order-md-1 order-last">
+                        <h3>Quản lý lịch hẹn</h3>
+                        <div id="alert" class="alert alert-secondary alert-dismissible fade"
+                             style="display: none; ">
+                            This is a secondary alert.
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="table-head" style="margin-bottom: 1rem">
+                <div class="dataTable-search">
+                    <input class="dataTable-input" placeholder=" Search..." type="text">
+                    <div class="buttons" style="margin-left: 1rem">
+                        <a href="#" class="btn btn-outline-dark" id="filterButtonSearch">Tìm kiếm</a>
+                    </div>
+                    <div class="buttons" style="margin-left: 1rem">
+                        <a href="#" class="btn btn-outline-dark" onclick="cal()" id="filterButtonSearch2">Xem lịch</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="filter-table" style="display: flex; flex-wrap: wrap;">
+                <div class="input-group mb-3" style="flex: 1 0 30%; max-width: 30%; margin-right: 1rem;">
+                    <select class="form-select" id="serviceSelect">
+                        <option selected="">Choose...</option>
+                        <option value="1">One</option>
+                        <option value="2">Two</option>
+                        <option value="3">Three</option>
+                    </select>
+                    <label class="input-group-text">Dịch vụ</label>
+                </div>
+
+                <div class="input-group mb-3" style="flex: 1 0 30%; max-width: 30%; margin-right: 1rem;">
+                    <input type="text" class="form-control datepicker" placeholder="Chọn ngày">
+                    <label class="input-group-text">Ngày đặt</label>
+                </div>
+                <div class="input-group mb-3" style="flex: 1 0 30%; max-width: 30%; margin-right: 1rem;">
+                    <select class="form-select">
+                        <option selected="">All</option>
+                        <option value="confirmed">Đã xác nhận</option>
+                        <option value="pending">Chờ xác nhận</option>
+                        <option value="completed">Hoàn thành</option>
+                        <option value="cancelled">Đã hủy</option>
+
+                    </select>
+                    <label class="input-group-text">Trạng thái</label>
+                </div>
+                <div class="buttons" onclick="filterBookings(event)" >
+                    <a href="#" class="btn btn-outline-dark">Lọc</a>
+                </div>
+            </div>
+            <!-- Hoverable rows start -->
+            <div class="row" id="table-hover-row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-content">
+                            <!-- table hover -->
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                    <tr>
+                                        <th class="text-center">ID</th>
+                                        <th class="text-center">TÊN KHÁCH HÀNG</th>
+                                        <th class="text-center">SỐ ĐIỆN THOẠI</th>
+                                        <th class="text-center">TÊN DỊCH VỤ</th>
+                                        <th class="text-center">GIỜ ĐẶT</th>
+                                        <th class="text-center">NGÀY ĐẶT</th>
+                                        <th class="text-center">ĐẶT LÚC</th>
+                                        <th class="text-center">GIÁ TIỀN (VND)</th>
+                                        <th class="text-center">TRẠNG THÁI</th>
+                                        <th class="text-center">HÀNH ĐỘNG</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="bookingTableBody">
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Nguyễn Văn A</td>
+                                        <td>0123 456 789</td>
+                                        <td>Tắm Spa và Groom</td>
+                                        <td>10:00</td>
+                                        <td>01/10/2024</td>
+                                        <td>
+                                            <span class="badge bg-success">Đã xác nhận</span>
+                                        </td>
+                                        <td>
+                                            <a href="#" title="View Details"
+                                               data-toggle="modal"
+                                               data-target="#view-booked-service"
+                                               style="display: inline-block; padding: 10px; margin-left: 10px; text-decoration: none; color: #000; text-align: center;">
+                                                <i class="fa fa-eye fa-lg" aria-hidden="true"></i>
+                                            </a>
+                                            <a href="#" title="Edit"
+                                               data-toggle="modal"
+                                               data-target="#edit-booked-service"
+                                            >
+                                                <i class="fas fa-pencil-alt badge-circle badge-circle-light-secondary font-medium-1 edit-icon fa-lg"
+                                                   style="margin-right: 5px"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <ul class="pagination pagination-primary float-right dataTable-pagination" id="pagination"
+                            style="justify-content: center;margin-top: 1rem">
+                            <li class="page-item pager"><a href="#" class="page-link" data-page="1">‹</a></li>
+                            <li class="page-item"><a href="#" class="page-link" data-page="1">1</a></li>
+                            <li class="page-item"><a href="#" class="page-link" data-page="2">2</a></li>
+                            <li class="page-item"><a href="#" class="page-link" data-page="3">3</a></li>
+                            <li class="page-item"><a href="#" class="page-link" data-page="4">4</a></li>
+                            <li class="page-item active"><a href="#" class="page-link" data-page="5">5</a></li>
+                            <li class="page-item"><a href="#" class="page-link" data-page="6">6</a></li>
+                            <li class="page-item pager"><a href="#" class="page-link" data-page="6">›</a></li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+            <!-- Hoverable rows end -->
+        </div>
+    </div>
+</div>
+
+
+<!--form Modal -->
+<div class="modal fade text-left" id="edit-booked-service" tabindex="-1" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Cập nhật đặt dịch vụ</h3>
+            </div>
+
+            <!-- Form cập nhật -->
+            <form action="#" id="editBookingForm">
+                <div class="modal-body">
+
+                    <!-- Mã đặt lịch -->
+                    <div class="mb-1">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Mã đặt lịch</span>
+                            <input type="text" class="form-control" aria-label="Sizing example input" disabled id="bookingId">
+                        </div>
+                    </div>
+                    <input type="hidden" id="customerId" value="ID_CỦA_KHÁCH_HÀNG">
+                    <!-- Tên khách hàng -->
+                    <div class="mb-1">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Tên khách hàng</span>
+                            <input type="text" class="form-control" aria-label="Sizing example input" id="customerName">
+                        </div>
+                    </div>
+
+                    <!-- Số điện thoại -->
+                    <div class="mb-1">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Số điện thoại</span>
+                            <input type="text" class="form-control" aria-label="Sizing example input" id="customerPhone">
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Email</span>
+                            <input type="email" class="form-control" aria-label="Sizing example input" id="customerEmail">
+                        </div>
+                    </div>
+
+                    <!-- Dịch vụ -->
+                    <div class="input-group mb-3">
+                        <label class="input-group-text">Dịch vụ</label>
+                        <select class="form-select" id="serviceSelect2">
+                            <option selected="">Choose...</option>
+                        </select>
+                    </div>
+
+                    <!-- Giờ đặt -->
+                    <div class="input-group mb-3">
+                        <label class="input-group-text">Giờ đặt</label>
+                        <select class="form-select" id="bookingTimeSelect">
+                            <option selected="" value="">Choose...</option>
+                            <option value="09:00">09:00</option>
+                            <option value="10:00">10:00</option>
+                            <option value="11:00">11:00</option>
+                            <option value="12:00">12:00</option>
+                            <option value="13:00">13:00</option>
+                            <option value="14:00">14:00</option>
+                            <option value="15:00">15:00</option>
+                            <option value="16:00">16:00</option>
+                            <option value="17:00">17:00</option>;
+                        </select>
+                    </div>
+
+                    <!-- Ngày đặt -->
+                    <div class="mb-1">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Ngày đặt</span>
+                            <input type="text" class="form-control datepicker" placeholder="Chọn ngày" id="bookingDate">
+                        </div>
+                    </div>
+
+                    <div class="mb-1">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Giá tiền</span>
+                            <input type="number" class="form-control" aria-label="Sizing example input" id="bookingPrice">
+                            <span class="input-group-text">VND</span>
+
+                        </div>
+                    </div>
+
+                    <!-- Trạng thái -->
+                    <div class="input-group mb-3">
+                        <label class="input-group-text">Trạng thái</label>
+                        <select class="form-select" id="statusSelect">
+                            <option selected="">Choose...</option>
+                            <option value="confirmed">Đã xác nhận</option>
+                            <option value="pending">Chờ xác nhận</option>
+                            <option value="completed">Hoàn thành</option>
+                            <option value="cancelled">Đã hủy</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <!-- Nút chức năng -->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+                        <i class="bx bx-x d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Đóng</span>
+                    </button>
+                    <button type="button" class="btn btn-green ml-1" id="saveBookingButton" onclick="updatebookservice()">
+                        <i class="bx bx-check d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Cập nhật</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!--end modal-->
+
+<div class="modal fade text-left" id="view-booked-service" tabindex="-1"
+     style="display: none;" aria-hidden="true" role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Thông tin đặt dịch vụ </h3>
+            </div>
+
+            <!--form cập nhật-->
+            <form action="#">
+                <div class="modal-body">
+
+                    <!--input-->
+                    <div class="card">
+                        <div class="card-content">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div class="col-4">Mã đặt dịch vụ:</div>
+                                    <div class="col-8 "></div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div class="col-4">Đặt vào lúc:</div>
+                                    <div class="col-8 "></div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div class="col-4">Tên khách hàng:</div>
+                                    <div class="col-8 "></div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div class="col-4">Số điện thoại:</div>
+                                    <div class="col-8 "></div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div class="col-4">Email:</div>
+                                    <div class="col-8 "></div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div class="col-4">Tên dịch vụ:</div>
+                                    <div class="col-8 "></div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div class="col-4">Giờ đặt:</div>
+                                    <div class="col-8 "></div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div class="col-4">Ngày đặt:</div>
+                                    <div class="col-8 "></div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div class="col-4">Ghi chú:</div>
+                                    <div class="col-8 "></div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div class="col-4">Phương thức thanh toán:</div>
+                                    <div class="col-8 "></div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div class="col-4">Giá tiền:</div>
+                                    <div class="col-8 "></div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div class="col-4">Trạng thái:</div>
+                                    <div class="col-8 "></div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div class="col-4">Thú cưng:</div>
+                                    <div class="col-8 "></div>
+                                </li>
+
+                            </ul>
+                            <div  id="userPets">
+                                <div class="pet">
+                                    <img src="assets/images/samples/inspirational-aerial-landscape-autumn-forest-and-FU2LKHA.jpg"
+                                         class="card-img-top img-fluid" alt="singleminded">
+                                    <div class="card-body2">
+                                        <h5 class="card-title">Be Single Minded</h5>
+                                        <p>Tuổi:</p>
+                                        <p>Giống:</p>
+                                        <p class="card-text">Cân nặng:</p>
+                                    </div>
+
+                                </div>
+                                <div class="pet">
+                                    <img src="assets/images/samples/inspirational-aerial-landscape-autumn-forest-and-FU2LKHA.jpg"
+                                         class="card-img-top img-fluid" alt="singleminded">
+                                    <div class="card-body2">
+                                        <h5 class="card-title">Be Single Minded</h5>
+                                        <p>Tuổi:</p>
+                                        <p>Giống:</p>
+                                        <p class="card-text">Cân nặng:</p>
+                                    </div>
+
+                                </div>
+                            </div>
+
+
+
+                        </div>
+
+                    </div>
+                    <!--end input-->
+                </div>
+
+                <!--button function-->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+                        <i class="bx bx-x d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Đóng</span>
+                    </button>
+                    <!--end button function-->
+                </div>
+            </form>
+            <!--end form-->
+        </div>
+    </div>
+</div>
+
+
+<div th:replace="admin/fragment/script :: script"></div>
+</body>
+</html>

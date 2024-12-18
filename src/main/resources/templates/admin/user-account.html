@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="admin/fragment/head :: head"></head>
+
+<script th:src="@{/admin/controller/user-account-ctrl.js}"></script>
+
+<style>
+    .modal-body {
+        max-height: 500px;
+        overflow-y: auto;
+    }
+
+    .card-img-top {
+        width: 100px;
+        height: 100px;
+        margin-left: 1.5rem;
+        border-radius: 0.267rem;
+    }
+
+    .pet {
+        display: flex;
+    }
+
+    .card-body2 {
+        padding: 0;
+        margin-left: 1rem;
+    }
+
+    .pet p {
+        margin: 0;
+    }
+
+    .card .card-body {
+        padding: 1.4rem 1.7rem;
+        padding-top: 0;
+    }
+</style>
+<body>
+<div id="app">
+    <div th:replace="admin/fragment/sidebar :: sidebar"></div>
+    <div id="main">
+        <div th:replace="admin/fragment/navbar :: navbar"></div>
+        <div class="main-content container-fluid">
+            <div class="page-title">
+                <div class="row">
+                    <div class="col-12 col-md-6 order-md-1 order-last">
+                        <h3>Quản lý tài khoản người dùng</h3>
+                        <div id="alert" class="alert alert-secondary alert-dismissible fade"
+                             style="display: none; ">
+                            This is a secondary alert.
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="table-head" style="margin-bottom: 1rem">
+                <div class="dataTable-search">
+                    <input class="dataTable-input" placeholder=" Search..." type="text">
+                </div>
+                <div class="text-right">
+                </div>
+            </div>
+            <!-- Hoverable rows start -->
+            <div class="row" id="table-hover-row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-content">
+                            <!-- table hover -->
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                    <tr>
+                                        <th class="text-center">ID</th>
+                                        <th class="text-center">TÊN NGƯỜI DÙNG</th>
+                                        <th class="text-center">SỐ ĐIỆN THOẠI</th>
+                                        <th class="text-center">EMAIL</th>
+                                        <th class="text-center">ĐỊA CHỈ</th>
+                                        <th class="text-center">HÀNH ĐỘNG</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="userAccountBody">
+                                    <tr>
+                                        <td>1</td>
+                                        <td>Nguyễn Văn A</td>
+                                        <td>nguyenvana@example.com</td>
+                                        <td>0123 456 789</td>
+                                        <td>123 Đường ABC, Quận 1, TP.HCM</td>
+                                        <td>
+                                            <a href="#"
+                                               title="View Details"
+                                               data-toggle="modal"
+                                               data-target="#view-user-account"
+                                               style="display: inline-block; padding: 10px; margin-left: 10px; text-decoration: none; color: #000; text-align: center;">
+                                                <i class="fa fa-eye fa-lg" aria-hidden="true"></i>
+                                            </a>
+                                            <a href="#" title="Edit"
+                                               data-toggle="modal"
+                                               data-target="#edit-user-account"
+                                            >
+                                                <i class="fas fa-pencil-alt badge-circle badge-circle-light-secondary font-medium-1 edit-icon fa-lg"
+                                                   style="margin-right: 5px"></i>
+                                            </a>
+                                            <a href="#" title="Delete" style="margin-left: 10px;"
+                                               data-toggle="modal"
+                                               data-target="#delete-user-account"
+                                            >
+                                                <i class="fas fa-trash badge-circle badge-circle-light-secondary font-medium-1 delete-icon fa-lg"></i>
+                                            </a>
+
+                                        </td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <ul class="pagination pagination-primary float-right dataTable-pagination" id="pagination"
+                            style="justify-content: center;margin-top: 1rem">
+                            <li class="page-item pager"><a href="#" class="page-link" data-page="1">‹</a></li>
+                            <li class="page-item"><a href="#" class="page-link" data-page="1">1</a></li>
+                            <li class="page-item"><a href="#" class="page-link" data-page="2">2</a></li>
+                            <li class="page-item"><a href="#" class="page-link" data-page="3">3</a></li>
+                            <li class="page-item"><a href="#" class="page-link" data-page="4">4</a></li>
+                            <li class="page-item active"><a href="#" class="page-link" data-page="5">5</a></li>
+                            <li class="page-item"><a href="#" class="page-link" data-page="6">6</a></li>
+                            <li class="page-item pager"><a href="#" class="page-link" data-page="6">›</a></li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+            <!-- Hoverable rows end -->
+        </div>
+    </div>
+</div>
+
+<!--create form Modal -->
+<div class="modal fade text-left" id="edit-user-account" tabindex="-1" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Cập nhật người dùng</h4>
+            </div>
+            <form id="editUserForm" action="#">
+                <div class="modal-body">
+                    <div class="mb-1">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Tên người dùng</span>
+                            <input type="text" class="form-control" id="editFullName" aria-label="Sizing example input">
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Số điện thoại</span>
+                            <input
+                                    type="tel"
+                                    class="form-control"
+                                    id="editPhone"
+                                    aria-label="Số điện thoại"
+                                    pattern="[0-9]{10,15}"
+                                    title="Vui lòng nhập số điện thoại hợp lệ (10-15 chữ số)"
+                                    required
+                            >
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Email</span>
+                            <input type="email" class="form-control" id="editEmail" aria-label="Sizing example input">
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Địa chỉ</span>
+                            <input type="text" class="form-control" id="editAddress" aria-label="Sizing example input">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+                        <i class="bx bx-x d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Đóng</span>
+                    </button>
+                    <button type="button" class="btn btn-green ml-1" onclick="updateUserAccount()" data-dismiss="modal">
+                        <i class="bx bx-check d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Cập nhật</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- Create form Modal -->
+<div class="modal fade text-left" id="create-user-account" tabindex="-1" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Thêm mới tài khoản người dùng</h4>
+            </div>
+            <form id="createUserForm" action="#">
+                <div class="modal-body">
+                    <div class="mb-1">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Tên người dùng</span>
+                            <input type="text" class="form-control" id="newUserName" aria-label="Sizing example input" required>
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Số điện thoại</span>
+                            <input type="text" class="form-control" id="newUserPhone" aria-label="Sizing example input" required>
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Email</span>
+                            <input type="email" class="form-control" id="newUserEmail" aria-label="Sizing example input" required>
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Địa chỉ</span>
+                            <input type="text" class="form-control" id="newUserAddress" aria-label="Sizing example input" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+                        <i class="bx bx-x d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Đóng</span>
+                    </button>
+                    <button type="button" class="btn btn-green ml-1" onclick="createUserAccount()">
+                        <i class="bx bx-check d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Thêm mới</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+<!-- form Modal -->
+<div class="modal fade text-left" id="delete-user-account" tabindex="-1"
+     style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Xóa tài khoản </h4>
+            </div>
+            <form action="#">
+                <div class="modal-body">
+                    <div class=" mb-1">
+                        <h6>Bạn có chắc muốn xóa <span style="font-size: 25px" id="userFullNameToDelete"></span> không?
+                        </h6>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+                        <i class="bx bx-x d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Đóng</span>
+                    </button>
+                    <button type="button" class="btn btn-green ml-1" data-dismiss="modal" onclick="deleteUserAccount()">
+                        <i class="bx bx-check d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Xóa</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade text-left" id="view-user-account" tabindex="-1" style="display: none;" aria-hidden="true"
+     role="dialog">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Thông tin người dùng </h3>
+            </div>
+
+            <form action="#">
+                <div class="modal-body">
+                    <div class="card">
+                        <div class="card-content">
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div class="col-4">Tên người dùng:</div>
+                                    <div class="col-8" id="userFullName"></div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div class="col-4">Số điện thoại:</div>
+                                    <div class="col-8" id="userPhone"></div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div class="col-4">Email:</div>
+                                    <div class="col-8" id="userEmail"></div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div class="col-4">Địa chỉ:</div>
+                                    <div class="col-8" id="userAddress"></div>
+                                </li>
+                                <li class="list-group-item d-flex justify-content-between">
+                                    <div class="col-4">Thú cưng:</div>
+                                </li>
+                            </ul>
+                            <div id="userPets"></div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+                        <span>Đóng</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div th:replace="admin/fragment/script :: script"></div>
+</body>
+</html>

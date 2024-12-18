@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="user/fragment/head :: head"></head>
+<script th:src="@{/user/controller/index-ctrl.js}"></script>
+
+<style>
+    .owl-nav {
+        display: none;
+    }
+
+    body {
+        background: linear-gradient(90deg, rgba(232, 243, 255, 1) 0%, rgba(215, 242, 250, 1) 51%, rgba(214, 247, 236, 0.6) 100%);
+    }
+
+    .pricing-item {
+        transition: opacity 0.5s ease;
+    }
+
+    .carousel-item {
+        display: flex;
+        justify-content: center;
+    }
+
+    .carousel-item.active .pricing-item {
+        opacity: 1; /* Rõ nét cho dịch vụ ở giữa */
+    }
+
+    .carousel-item:not(.active) .pricing-item {
+        opacity: 0.5; /* Mờ dần cho các dịch vụ không hoạt động */
+    }
+
+    .grata {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+    }
+
+    .grata p {
+        margin: 0;
+    }
+
+    .feature-item {
+        transition: transform 0.3s, box-shadow 0.3s; /* Thêm hiệu ứng chuyển tiếp */
+        cursor: pointer; /* Thay đổi con trỏ khi di chuột */
+    }
+
+    .feature-item:hover {
+        transform: translateY(-5px); /* Nâng cao mục khi hover */
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2); /* Thêm bóng mờ */
+    }
+
+    .feature-content {
+        background-color: rgba(0, 0, 0, 0.7); /* Thêm nền mờ cho nội dung */
+        transition: background-color 0.3s; /* Thêm hiệu ứng chuyển tiếp */
+    }
+
+    .feature-item:hover .feature-content {
+        background-color: rgba(0, 0, 0, 0.9); /* Tối màu nền khi hover */
+    }
+
+    .hover-effect {
+        transition: transform 0.3s, box-shadow 0.3s;
+    }
+
+    .hover-effect:hover {
+        transform: scale(1.05);
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    }
+</style>
+<body>
+<div th:replace="user/fragment/navbar :: navbar"></div>
+<!-- Carousel Start -->
+<div class="header-carousel owl-carousel">
+    <div class="header-carousel-item">
+        <img th:src="@{https://images.stockcake.com/public/e/1/f/e1fcc216-e2af-49c0-8572-f8c6b61fc5ea_large/veterinarian-loving-dog-stockcake.jpg}"
+             class="img-fluid w-100" alt="Image">
+        <div class="carousel-caption">
+            <div class="container align-items-center py-4">
+                <div class="row g-5 align-items-center">
+                    <div class="col-xl-7 fadeInLeft animated" data-animation="fadeInLeft" data-delay="1s"
+                         style="animation-delay: 1s;">
+                        <div class="text-start">
+                            <h4 class="text-primary text-uppercase fw-bold mb-4">Welcome To Pet Care</h4>
+                            <h1 class="display-4 text-uppercase text-white mb-4">Dịch vụ thú cưng chuẩn 5 sao</h1>
+                            <div class="grata">
+                                <div th:each="service : ${groupServices}"
+                                >
+                                    <p class="mb-4 fs-5" th:text="${service.name}"></p>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="header-carousel-item">
+        <img th:src="@{https://images.stockcake.com/public/e/7/0/e70f2b2f-6d68-4b05-9fec-7a0fff05adf5_large/veterinarian-examining-cat-stockcake.jpg}"
+             class="img-fluid w-100" alt="Image">
+        <div class="carousel-caption">
+            <div class="container py-4">
+                <div class="row g-5 align-items-center">
+                    <div class="col-xl-7 fadeInLeft animated" data-animation="fadeInLeft" data-delay="1s"
+                         style="animation-delay: 1s;">
+                        <div class="text-start">
+                            <h4 class="text-primary text-uppercase fw-bold mb-4">Welcome To Pet Care</h4>
+                            <h1 class="display-4 text-uppercase text-white mb-4">Dịch vụ thú cưng chuẩn 5 sao</h1>
+                            <div class="grata">
+                                <div th:each="service : ${groupServices}"
+                                >
+                                    <p class="mb-4 fs-5" th:text="${service.name}"></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Carousel End -->
+<!-- Feature Start -->
+<div class="container-fluid feature py-5">
+    <div class="container py-5">
+        <div class="text-center mx-auto pb-5 wow fadeInUp" data-wow-delay="0.2s" style="max-width: 800px;">
+            <h1 class="display-5 mb-4">Dịch vụ mới</h1>
+        </div>
+        <div class="row g-4">
+            <th:block th:each="service : ${topServices}">
+                <div class="col-lg-4 wow fadeInUp" data-wow-delay="0.2s">
+                    <div class="feature-item hover-effect">
+                        <img style="height: 300px"
+                             th:src="${service.base64Image != null ? service.base64Image : 'default-image-url.jpg'}"
+                             class="img-fluid rounded w-100" alt="Image"/>
+                        <div class="feature-content p-4">
+                            <div class="feature-content-inner">
+                                <h4 class="text-white" th:text="${service.name}">Tên dịch vụ</h4>
+                                <p style="color: #d8d8d8">Loại dịch vụ: <span
+                                        th:text="${service.groupService.name}"></span></p>
+                                <p style="color: #d8d8d8">Mô tả: <span th:text="${service.description}"></span></p>
+                                <p style="color: #d8d8d8">Giá: <span class="formatted-price"></span> VND</p>
+                                <script th:inline="javascript">
+                                    // Định nghĩa một hàm để cập nhật giá
+                                    (function() {
+                                        const servicePrice = /*[[${service.price}]]*/ 1000000.5; // Thay thế bằng giá thực tế từ server
+
+                                        function formatPrice(price) {
+                                            // Làm tròn giá và chuyển đổi thành chuỗi, thêm dấu chấm
+                                            const roundedPrice = Math.floor(price);
+                                            return roundedPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                                        }
+
+                                        // Cập nhật giá cho phần tử hiện tại
+                                        const prices = document.querySelectorAll('.formatted-price');
+                                        prices[prices.length - 1].innerText = formatPrice(servicePrice);
+                                    })();
+                                </script>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </th:block>
+        </div>
+
+    </div>
+    <div style="text-align: center">
+        <a th:href="@{/services}" class="btn btn-primary rounded-pill py-2 px-4">Xem thêm <i
+                class="fa fa-arrow-right ms-1"></i></a>
+    </div>
+</div>
+<!-- Feature End -->
+
+<!-- Ticket Packages Start -->
+<div class="container-fluid">
+    <div class="container py-5" style="padding-top: 0 !important;">
+        <div class="row g-5 align-items-center">
+            <div class="col-lg-12 col-xl-2 wow fadeInUp" data-wow-delay="0.2s">
+                <div class="packages-item h-100">
+                    <h1 class="display-5 mb-4">Gói combo dịch vụ</h1>
+                    <p class="mb-4">Lợi ích khi chọn combo</p>
+                    <p><i class="fa fa-check text-primary me-2"></i>Tiết kiệm chi phí</p>
+                    <p><i class="fa fa-check text-primary me-2"></i>Tiện lợi</p>
+                    <p><i class="fa fa-check text-primary me-2"></i>Nhiều ưu đãi</p>
+                    <p><i class="fa fa-check text-primary me-2"></i>Chăm sóc toàn diện</p>
+                </div>
+            </div>
+            <div class="col-xl-10">
+                <div class="row">
+                    <div th:each="service : ${comboServices}" class="col-lg-6 col-xl-6 wow fadeInUp"
+                         style="margin-bottom: 1rem" data-wow-delay="0.4s">
+                        <div class="pricing-item bg-dark rounded text-center p-5 h-100 hover-effect">
+                            <div class="pb-4 border-bottom">
+                                <h2 class="text-primary" th:text="${service.name}">Combo Service</h2>
+                                <p th:text="${service.description}">Lorem ipsum dolor sit amet consectetur adipisicing
+                                    elit. Possimus, dolorum!</p>
+                                <h2 class="mb-0 text-primary">
+                                    <span class="formatted-price"></span> VND
+                                    <span class="text-body fs-5 fw-normal">/combo</span>
+                                </h2>
+                                <script th:inline="javascript">
+                                    // Định nghĩa một hàm để cập nhật giá
+                                    (function() {
+                                        const servicePrice = /*[[${service.price}]]*/ 1000000.5; // Thay thế bằng giá thực tế từ server
+
+                                        function formatPrice(price) {
+                                            // Làm tròn giá và chuyển đổi thành chuỗi, thêm dấu chấm
+                                            const roundedPrice = Math.floor(price);
+                                            return roundedPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                                        }
+
+                                        // Cập nhật giá cho phần tử hiện tại
+                                        const prices = document.querySelectorAll('.formatted-price');
+                                        prices[prices.length - 1].innerText = formatPrice(servicePrice);
+                                    })();
+                                </script>
+                            </div>
+                            <a style="margin-top: 1rem" href="#" class="btn btn-light rounded-pill py-3 px-5"
+                               th:data-service-id="${service.id}"
+                               th:data-service-name="${service.name}"
+                               th:data-group-service-id="${service.groupService.id}"
+                               onclick="redirectToBooking(this)">Book Now</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="room-list flex-grow-1" style="padding-top: 1rem; padding-left: 6.5rem; padding-right: 6.5rem;">
+    <div class="list-group wow fadeInUp" data-wow-delay="0.2s">
+        <div class="list-group-item-room align-items-center">
+            <div class="list-group-vete">
+                <div class="group-top" style="justify-content: space-between">
+                    <h3 style="padding-left: 2rem; padding-top: 1rem">Khách hàng nói gì về chúng tôi</h3>
+                    <p style="padding-right: 2rem; padding-top: 1rem" th:text="${totalRatings} + ' đánh giá'">285 đánh giá</p>
+                </div>
+                <hr style="margin: 20px 0; border-top: 1px solid #00bbff;">
+                <ul class="list-group" id="ratings-list">
+                </ul>
+                <div class="div-group-bot">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center" id="pagination">
+                            <li class="page-item" id="prev-page">
+                                <a class="page-link" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                            <!-- Các nút trang sẽ được tạo động ở đây -->
+                            <li class="page-item" id="next-page">
+                                <a class="page-link" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const ratings = /*[[${ratings}]]*/ []; // Dữ liệu đánh giá từ backend
+    const itemsPerPage = 5; // Số lượng đánh giá trên mỗi trang
+    let currentPage = 0;
+    const totalPages = Math.ceil(ratings.length / itemsPerPage);
+
+    console.log(ratings);
+
+    function displayRatings(page) {
+        const start = page * itemsPerPage;
+        const end = start + itemsPerPage;
+        const ratingsList = document.getElementById('ratings-list');
+        ratingsList.innerHTML = ''; // Xóa danh sách hiện tại
+
+        const currentRatings = ratings.slice(start, end);
+        currentRatings.forEach(rating => {
+            const listItem = document.createElement('li');
+            listItem.className = 'list-group-item';
+            listItem.style.background = 'none';
+            listItem.style.border = 'none';
+
+            listItem.innerHTML = `
+                <div class="list-group-vete">
+                    <div class="group-top" style="align-items: normal">
+                        <img src="${rating.userBase64Image}" alt="User Image" class="service-image"
+                        style="margin-right: 15px; border-radius: 75px;
+                        padding-right: 0;
+                         width: 100px; height: 100px;">
+                        <div class="flex-grow-1" style="padding-left: 1rem">
+                            <h5>${rating.userFullName}</h5>
+                            <div class="stars-container" data-rating="${rating.rating}"></div>
+                            <p>${rating.comment}</p>
+                            <img src="${rating.base64Image}" alt="Phòng 101" style="width:auto;height: 200px;">
+                        </div>
+                        <div>
+                            <p class="btn-book-hotel rating-date" data-created-at="${rating.createdAt}"></p>
+                        </div>
+                    </div>
+                    <hr style="margin: 20px 0; border-top: 1px solid #00bbff;">
+                </div>
+            `;
+            ratingsList.appendChild(listItem);
+        });
+
+        updateRatingDates();
+        updateRatingStars();
+    }
+
+    function updateRatingStars() {
+        document.querySelectorAll('.stars-container').forEach(container => {
+            const rating = parseInt(container.getAttribute('data-rating'), 10);
+            displayRatingStars(rating, container);
+        });
+    }
+
+    function displayRatingStars(rating, container) {
+        let starsHTML = '';
+        for (let i = 1; i <= 5; i++) {
+            starsHTML += `<svg style="margin-right: 10px" width="16" height="16" fill="${i <= rating ? '#3cbeee' : '#b8b8b3'}" viewBox="0 0 16 16">
+                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"></path>
+            </svg>`;
+        }
+        container.innerHTML = starsHTML;
+    }
+
+    function updateRatingDates() {
+        document.querySelectorAll('.rating-date').forEach(item => {
+            const originalDate = item.getAttribute('data-created-at');
+            const formattedDate = formatDate(originalDate);
+            item.innerText = formattedDate;
+        });
+    }
+
+    function formatDate(dateString) {
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+        const date = new Date(dateString);
+        return date.toLocaleDateString('vi-VN', options);
+    }
+
+    function updatePagination() {
+        const pagination = document.getElementById('pagination');
+        pagination.innerHTML = ''; // Xóa nội dung hiện tại
+
+        // Nút "Previous"
+        const prevItem = document.createElement('li');
+        prevItem.className = 'page-item';
+        prevItem.innerHTML = `<a class="page-link" id="prev-page" aria-label="Previous">&laquo;</a>`;
+        pagination.appendChild(prevItem);
+
+        // Thêm các nút trang
+        for (let i = 0; i < totalPages; i++) {
+            const pageItem = document.createElement('li');
+            pageItem.className = `page-item ${currentPage === i ? 'active' : ''}`;
+            pageItem.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i + 1}</a>`;
+            pagination.appendChild(pageItem);
+
+            // Thêm sự kiện click cho từng nút trang
+            pageItem.querySelector('a').addEventListener('click', (e) => {
+                e.preventDefault();
+                currentPage = i;
+                displayRatings(currentPage);
+                updatePagination();
+            });
+        }
+
+        // Nút "Next"
+        const nextItem = document.createElement('li');
+        nextItem.className = 'page-item';
+        nextItem.innerHTML = `<a class="page-link" id="next-page" aria-label="Next">&raquo;</a>`;
+        pagination.appendChild(nextItem);
+
+        // Cập nhật trạng thái cho nút "Previous" và "Next"
+        const prevButton = document.getElementById('prev-page');
+        const nextButton = document.getElementById('next-page');
+
+        prevButton.classList.toggle('disabled', currentPage === 0);
+        nextButton.classList.toggle('disabled', currentPage === totalPages - 1);
+    }
+
+    document.getElementById('prev-page').addEventListener('click', (e) => {
+        e.preventDefault();
+        if (currentPage > 0) {
+            currentPage--;
+            displayRatings(currentPage);
+            updatePagination();
+        }
+    });
+
+    document.getElementById('next-page').addEventListener('click', (e) => {
+        e.preventDefault();
+        if (currentPage < totalPages - 1) {
+            currentPage++;
+            displayRatings(currentPage);
+            updatePagination();
+        }
+    });
+
+    // Hiển thị đánh giá cho trang đầu tiên
+    displayRatings(currentPage);
+    updatePagination();
+</script>
+
+<script>
+    function displayRatingStars(rating, container) {
+        let starsHTML = '';
+        const totalStars = 5; // Tổng số sao
+        console.log(rating)
+        for (let i = 1; i <= totalStars; i++) {
+            starsHTML += `<svg style="margin-right: 10px" width="16" height="16" fill="${i <= rating ? '#3cbeee' : '#b8b8b3'}" viewBox="0 0 16 16">
+                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"></path>
+            </svg>`;
+        }
+        container.innerHTML = starsHTML;
+    }
+
+    // Gọi hàm cho mỗi đánh giá
+    document.querySelectorAll('.stars-container').forEach(container => {
+        const rating = parseInt(container.getAttribute('data-rating'), 10);
+        displayRatingStars(rating, container);
+    });
+
+
+    function formatDate(dateString) {
+        const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+        const date = new Date(dateString);
+        return date.toLocaleDateString('vi-VN', options);
+    }
+
+    // Cập nhật ngày đánh giá
+    document.querySelectorAll('.rating-date').forEach(item => {
+        const originalDate = item.getAttribute('data-created-at'); // Lấy ngày từ thuộc tính data
+        const formattedDate = formatDate(originalDate); // Định dạng lại ngày
+        item.innerText = formattedDate; // Cập nhật nội dung
+    });
+</script>
+<script>
+    function redirectToBooking(button) {
+        const serviceId = button.getAttribute('data-service-id');
+        const serviceName = button.getAttribute('data-service-name');
+        const groupServiceId = button.getAttribute('data-group-service-id');
+
+        window.location.href = `/booking?serviceId=${serviceId}&groupServiceId=${groupServiceId}&serviceName=${encodeURIComponent(serviceName)}`;
+    }
+</script>
+<footer th:replace="user/fragment/footer :: footer"></footer>
+<div th:replace="user/fragment/script :: script"></div>
+</body>
+</html>

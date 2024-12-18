@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="admin/fragment/head :: head"></head>
+
+<script th:src="@{/admin/controller/service-detail-ctrl.js}"></script>
+
+
+<body>
+<div id="app">
+    <div th:replace="admin/fragment/sidebar :: sidebar"></div>
+    <div id="main">
+
+        <div th:replace="admin/fragment/navbar :: navbar"></div>
+
+        <div class="main-content container-fluid">
+            <div class="page-title">
+                <div class="row">
+                    <div class="col-12 col-md-6 order-md-1 order-last">
+                        <h3>Quản lý chi tiết dịch vụ</h3>
+                        <div id="alert" class="alert alert-secondary alert-dismissible fade"
+                             style="display: none; ">
+                            This is a secondary alert.
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="table-head">
+                <div class="dataTable-search">
+<!--                    <input class="dataTable-input" placeholder=" Search..." type="text">-->
+                </div>
+                <div class="text-right" >
+                    <button class="btn  btn-green"
+                            data-toggle="modal"
+                            data-target="#create-service-detail">Thêm mới
+                    </button>
+                </div>
+            </div>
+
+            <!-- Hoverable rows start -->
+            <div class="row" id="table-hover-row">
+                <div class="col-12">
+                    <div class="card">
+
+                        <div class="card-content">
+
+                            <!-- table hover -->
+                            <div class="table-responsive">
+
+
+                                <table class="table table-hover mb-0">
+
+                                    <thead>
+                                    <tr>
+                                        <th class="text-center">STT</th>
+                                        <th class="text-center">CÂN NẶNG</th>
+                                        <th class="text-center">GIÁ TIỀN + %</th>
+                                        <th class="text-center">HÀNH ĐỘNG</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="serviceDetailBody">
+                                    <tr>
+                                        <td>DVC003</td>
+                                        <td>Đưa đón thú cưng</td>
+                                        <td>3</td>
+                                        <td>300.000 VNĐ</td>
+                                        <td>
+                                            <a href="#" title="Edit"
+                                               data-toggle="modal"
+                                               data-target="#edit-service-detail"
+                                            >
+                                                <i class="fas fa-pencil-alt badge-circle badge-circle-light-secondary font-medium-1 edit-icon fa-lg"
+                                                   style="margin-right: 5px"></i>
+                                            </a>
+                                            <a href="#" title="Delete" style="margin-left: 10px;"
+                                               data-toggle="modal"
+                                               data-target="#delete-service-detail"
+                                            >
+                                                <i class="fas fa-trash badge-circle badge-circle-light-secondary font-medium-1 delete-icon fa-lg"></i>
+                                            </a>
+                                        </td>
+                                    </tr>
+
+
+                                    </tbody>
+
+
+                                </table>
+
+                            </div>
+
+                        </div>
+                        <ul class="pagination pagination-primary float-right dataTable-pagination" id="pagination"
+                            style="justify-content: center;margin-top: 1rem">
+                            <li class="page-item pager"><a href="#" class="page-link" data-page="1">‹</a></li>
+                            <li class="page-item"><a href="#" class="page-link" data-page="1">1</a></li>
+                            <li class="page-item"><a href="#" class="page-link" data-page="2">2</a></li>
+                            <li class="page-item"><a href="#" class="page-link" data-page="3">3</a></li>
+                            <li class="page-item"><a href="#" class="page-link" data-page="4">4</a></li>
+                            <li class="page-item active"><a href="#" class="page-link" data-page="5">5</a></li>
+                            <li class="page-item"><a href="#" class="page-link" data-page="6">6</a></li>
+                            <li class="page-item pager"><a href="#" class="page-link" data-page="6">›</a></li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+            <!-- Hoverable rows end -->
+        </div>
+
+
+    </div>
+</div>
+
+<!--form Modal -->
+<div class="modal fade text-left" id="create-service-detail" tabindex="-1" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Tạo dịch vụ chi tiết</h3>
+            </div>
+            <!--form tạo mới-->
+            <form id="createServiceDetailForm">
+                <div class="modal-body">
+                    <!-- Cân nặng -->
+                    <div class="mb-1">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Cân nặng</span>
+                            <input type="text" class="form-control" id="newWeight" required>
+                            <span class="input-group-text">KG</span>
+                        </div>
+                    </div>
+                    <!-- Giá tiền -->
+                    <div class="mb-1">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Giá tiền</span>
+                            <input type="number" class="form-control" id="newPrice" required>
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!--button function-->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+                        <i class="bx bx-x d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Đóng</span>
+                    </button>
+                    <button type="button" class="btn btn-green ml-1" id="createServiceDetailButton" onclick="createServiceDetail()">
+                        <i class="bx bx-check d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Tạo mới</span>
+                    </button>
+                </div>
+            </form>
+            <!--end form-->
+        </div>
+    </div>
+</div>
+<!--end modal-->
+
+
+<!--form Modal -->
+<div class="modal fade text-left" id="edit-service-detail" tabindex="-1" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Cập nhật dịch vụ</h3>
+            </div>
+
+            <!--form cập nhật-->
+            <form id="updateServiceForm">
+                <div class="modal-body">
+                    <!-- Cân nặng -->
+                    <div class="mb-1">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Cân nặng</span>
+                            <input type="text" class="form-control" id="weight" aria-label="Amount (to the nearest dollar)" required>
+                            <span class="input-group-text">KG</span>
+                        </div>
+                    </div>
+                    <!-- Giá tiền -->
+                    <div class="mb-1">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Giá tiền </span>
+                            <input type="number" class="form-control" id="price" aria-label="Amount (to the nearest dollar)" required>
+                            <span class="input-group-text">%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!--button function-->
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+                        <span>Đóng</span>
+                    </button>
+                    <button type="button" class="btn btn-green ml-1"  onclick="updateServiceDetail()">
+                        <span>Cập nhật</span>
+                    </button>
+                </div>
+            </form>
+            <!--end form-->
+        </div>
+    </div>
+</div>
+<!--end modal-->
+
+<!-- form Modal -->
+<div class="modal fade text-left" id="delete-service-detail" tabindex="-1"
+     style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Xóa Dịch Vụ </h4>
+            </div>
+            <form action="#">
+                <div class="modal-body">
+                    <div class=" mb-1">
+                        <h6>Bạn có chắc muốn xóa <span style="font-size: 25px" id="serviceCodeToDelete"></span> không?</h6>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+                        <i class="bx bx-x d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Đóng</span>
+                    </button>
+                    <button type="button" class="btn btn-green ml-1" data-dismiss="modal" onclick="deleteServiceDetail()">
+                        <i class="bx bx-check d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Xóa</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+<div th:replace="admin/fragment/script :: script"></div>
+</body>
+</html>

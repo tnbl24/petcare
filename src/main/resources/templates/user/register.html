@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Care</title>
+    <link rel="stylesheet" th:href="@{/my/css/style.css}">
+    <link rel="shortcut icon" th:href="@{/admin/assets/images/logoPetCare.svg}" type="image/x-icon">
+
+    <script th:src="@{/user/controller/login.js}"></script>
+
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="tab">
+        <div class="register-tab active" onclick="showRegister()">Đăng Ký</div>
+    </div>
+    <div id="alert" class="alert alert-secondary alert-dismissible fade" style="display: none; color: #d20000;">
+        <span id="alert-message" th:text="${errorMessage}">></span>
+
+    </div>
+    <form id="register-form" th:action="@{/register}" method="post" th:object="${userDTO}">
+        <div class="input-field">
+            <input type="text" required name="username" th:field="*{username}">
+            <label>Tên đăng nhập</label>
+        </div>
+        <div class="input-field">
+            <input type="password" required name="password" th:field="*{password}">
+            <label>Mật khẩu</label>
+        </div>
+        <div class="input-field">
+            <input type="text" required name="fullname" th:field="*{fullName}">
+            <label>Họ và tên đầy đủ</label>
+        </div>
+        <div class="input-field">
+            <input type="tel" required name="phone" th:field="*{phone}">
+            <label>Số điện thoại</label>
+        </div>
+        <div class="input-field">
+            <input type="text" required name="email" th:field="*{email}">
+            <label>Email</label>
+        </div>
+        <button type="submit">Đăng ký</button>
+        <p style="margin-top: 1rem">Đã có tài khoản? <a th:href="@{/login}">Đăng nhập</a></p>
+    </form>
+</div>
+<script>
+
+    function showErrorforForm(message, color) {
+        const alertDiv = document.getElementById('alert');
+        const alertMessage = document.getElementById('alert-message');
+
+        alertMessage.textContent = message; // Cập nhật nội dung thông báo
+        alertDiv.className = `alert ${color}`; // Thêm lớp màu
+        alertDiv.style.display = 'block'; // Hiển thị alert
+        alertDiv.classList.add('show'); // Thêm lớp show để hiển thị hiệu ứng
+    }
+
+    function closeAlert() {
+        const alertDiv = document.getElementById('alert');
+        alertDiv.style.display = 'none'; // Ẩn alert
+    }
+
+    function checkRegister() {
+        const phoneInput = document.querySelector('input[name="phone"]');
+        const usernameInput = document.querySelector('input[name="username"]');
+        const emailInput = document.querySelector('input[name="email"]');
+        const passwordInput = document.querySelector('input[name="password"]'); // Thêm dòng này
+
+        const username = usernameInput.value;
+        const phone = phoneInput.value;
+        const email = emailInput.value;
+        const password = passwordInput.value; // Thêm dòng này
+
+        const phonePattern = /^\d{10,15}$/; // Biểu thức chính quy cho số điện thoại
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/; // Biểu thức chính quy cho email
+
+        if (username.length < 4) {
+            showErrorforForm('Tên đăng nhập phải có ít nhất 4 ký tự!', 'alert-light-danger');
+            usernameInput.focus();
+            return false; // Ngăn gửi biểu mẫu
+        }
+
+        // Kiểm tra độ dài mật khẩu
+        if (password.length < 4) {
+            showErrorforForm('Mật khẩu phải có ít nhất 4 ký tự!', 'alert-light-danger');
+            passwordInput.focus();
+            return false; // Ngăn gửi biểu mẫu
+        }
+
+        // Kiểm tra số điện thoại
+        if (!phonePattern.test(phone)) {
+            showErrorforForm('Số điện thoại không hợp lệ! Vui lòng nhập lại.', 'alert-light-danger');
+            phoneInput.focus();
+            return false; // Ngăn gửi biểu mẫu
+        }
+
+        // Kiểm tra email
+        if (!emailPattern.test(email)) {
+            showErrorforForm('Địa chỉ email không hợp lệ! Vui lòng kiểm tra lại.', 'alert-light-danger');
+            emailInput.focus();
+            return false; // Ngăn gửi biểu mẫu
+        }
+
+        return true; // Cho phép gửi biểu mẫu
+    }
+
+    document.getElementById('register-form').onsubmit = function (event) {
+        event.preventDefault(); // Ngăn gửi form theo cách thông thường
+
+        if (!checkRegister()) {
+            return; // Nếu kiểm tra không hợp lệ, không gửi form
+        }
+
+        const formData = new FormData(this); // Lấy dữ liệu từ biểu mẫu
+
+        fetch(this.action, { // Gửi yêu cầu đến server
+            method: 'POST',
+            body: formData,
+        })
+            .then(response => response.text()) // Nhận phản hồi dạng văn bản
+            .then(data => {
+                // Nếu server trả về thông báo lỗi
+                if (data.includes('errorMessage')) {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data, 'text/html');
+                    const errorMessage = doc.querySelector('#alert-message').textContent;
+                    showErrorforForm(errorMessage, 'alert-light-danger');
+                } else {
+                    // Nếu không có lỗi, bạn có thể chuyển hướng hoặc làm gì đó khác
+                    window.location.href = '/login'; // Chuyển hướng đến trang đăng nhập
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorforForm('Có lỗi xảy ra! Vui lòng thử lại.',error.message,'alert-light-danger');
+            });
+    };
+
+</script>
+<script th:src="@{/my/js/sidebar.js}"></script>
+</body>
+</html>

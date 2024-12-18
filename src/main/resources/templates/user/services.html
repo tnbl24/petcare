@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="user/fragment/head :: head"></head>
+<body>
+<div th:replace="user/fragment/navbar :: navbar"></div>
+<style>
+    thead, tbody, tfoot, tr, td, th {
+        border-color: inherit;
+        border-width: 0;
+        border-radius: 8px;
+        border-style: none
+    }
+
+    thead {
+        text-align: center;
+    }
+
+    .div-group-bot {
+        margin: 10px;
+    }
+
+    .table tbody tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+</style>
+<style>
+    body {
+        background: linear-gradient(90deg, rgba(232, 243, 255, 1) 0%, rgba(215, 242, 250, 1) 51%, rgba(214, 247, 236, 0.6) 100%);
+    }
+
+    .list-group-item-room {
+        background: white;
+    }
+
+    .flex-grow-1 {
+        margin-top: 10px;
+    }
+
+    .active-button {
+        background-color: #3cbeee; /* Màu nền cho nút active */
+        color: white; /* Màu chữ cho nút active */
+        border: 1px solid #dee2e6;
+    }
+</style>
+
+<div class="container d-flex">
+    <div class="filter-section wow fadeInUp" data-wow-delay="0.2s">
+        <h2 class="text-center" style="font-weight: 650;color: #00aded;margin-bottom: 2rem;">Dịch vụ</h2>
+        <form action="/services" method="get">
+            <div class="form-group">
+                <label class="cach1">Tìm kiếm:</label>
+                <input type="text" class="form-control cach2" name="search" th:value="${search}">
+            </div>
+            <div class="form-group">
+                <label class="cach1">Loại dịch vụ:</label>
+                <select class="form-control cach2" name="groupServiceId">
+                    <option value="">All</option>
+                    <option th:each="groupService : ${groupServices}"
+                            th:value="${groupService.id}"
+                            th:text="${groupService.name}"
+                            th:selected="${groupServiceId == groupService.id}"></option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary cach2">Tìm Kiếm</button>
+        </form>
+    </div>
+
+    <div class="room-list flex-grow-1">
+        <ul class="list-group wow fadeInUp" data-wow-delay="0.2s">
+            <li class="list-group-item-room align-items-center" th:each="service : ${services}">
+                <div class="list-group-vete">
+                    <div class="group-top">
+                        <img th:src="${service.base64Image}" alt="Service Image"
+                             style="padding: 0;margin-right: 1.5rem;width: 200px;height: 150px"
+                             class="service-image"/>
+                        <div class="flex-grow-1">
+                            <h4 th:text="${service.name}">Dịch vụ tắm cho thú cưng</h4>
+                            <p class="group-service-name" th:text="'Loại: ' +${service.groupService.name}">Tên nhóm dịch
+                                vụ</p>
+                            <p th:text="${service.description}">Mô tả: Phòng rộng 80x80x160, có giường quạt,..</p>
+                        </div>
+                        <div>
+                            <button type="button" class="btn btn-primary btn-book-hotel"
+                                    th:data-service-id="${service.id}"
+                                    th:data-service-name="${service.name}"
+                                    th:data-group-service-id="${service.groupService.id}"
+                                    onclick="redirectToBooking(this)">Đặt
+                            </button>
+                        </div>
+                    </div>
+                    <div class="div-group-bot" th:if="${service.hasDetail == '1'}">
+                        <table class="table info-table">
+                            <thead class="head-table">
+                            <tr>
+                                <th>Cân nặng</th>
+                                <th>Giá tiền</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <tr th:each="detail : ${service.serviceDetails}">
+                                <td th:text="'Từ ' + ${detail.weight} + ' kg'">Nội dung 1.1</td>
+                                <td class="price2 text-center" th:attr="data-price=${detail.price}">Cân nặng</td>
+
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="div-group-bot" th:if="${service.hasDetail == '0'}">
+                        <table class="table info-table">
+                            <thead class="head-table">
+                            <tr>
+                                <th class="price" th:attr="data-price=${service.price}">Cân nặng</th>
+                            </tr>
+                            </thead>
+                        </table>
+                    </div>
+                </div>
+            </li>
+        </ul>
+        <hr style="margin: 20px 0; border-top: 1px solid #00bbff;">
+        <nav aria-label="Page navigation">
+            <form action="/services" method="get">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item" th:class="${currentPage == 0} ? 'disabled'">
+                        <button type="submit"
+                                style="border-top-left-radius: 10px; border-bottom-left-radius: 10px;"
+                                name="page" th:value="${currentPage - 1}"
+                                th:disabled="${currentPage == 0}" class="page-link" aria-label="Previous">
+                            <span aria-hidden="true">&laquo;</span>
+                        </button>
+                    </li>
+
+                    <li class="page-item"
+                        th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                        th:if="${i >= (currentPage - 2) && i <= (currentPage + 2)}"
+                        th:class="${currentPage == i} ? 'active'">
+                        <button type="submit"
+                                name="page"
+                                th:value="${i}"
+                                th:class="${currentPage == i} ? ' page-link active-button':' page-link' "
+                        >
+                            <span th:text="${i + 1}"></span>
+                        </button>
+                    </li>
+
+                    <li class="page-item" th:class="${currentPage + 1 == totalPages} ? 'disabled'">
+                        <button type="submit"
+                                style="border-top-right-radius: 10px;border-bottom-right-radius: 10px;"
+                                name="page"
+                                th:value="${currentPage + 1}"
+                                th:disabled="${currentPage + 1 == totalPages}" class="page-link" aria-label="Next">
+                            <span aria-hidden="true">&raquo;</span>
+                        </button>
+                    </li>
+                </ul>
+                <input type="hidden" name="size" th:value="${size}"/>
+                <input type="hidden" name="search" th:value="${search}"/>
+                <input type="hidden" name="groupServiceId" th:value="${groupServiceId}"/>
+            </form>
+        </nav>
+    </div>
+</div>
+
+<!--rating-->
+
+<div class="room-list flex-grow-1" style="padding-top: 1rem; padding-left: 6.5rem; padding-right: 6.5rem;">
+    <div class="list-group wow fadeInUp" data-wow-delay="0.2s">
+        <div class="list-group-item-room align-items-center" >
+            <div class="list-group-vete">
+                <div class="group-top" style="justify-content: space-between">
+                    <h3 style="padding-left: 2rem; padding-top: 1rem">Đánh giá gần đây</h3>
+                    <p style="padding-right: 2rem; padding-top: 1rem" id="total-ratings">285 đánh giá</p>
+                </div>
+                <hr style="margin: 20px 0; border-top: 1px solid #00bbff;">
+                <div id="filtered-ratings-output">
+                    <ul id="ratings-list" class="list-group">
+                        <!-- Danh sách đánh giá sẽ được hiển thị ở đây -->
+                    </ul>
+                </div>
+                <div class="div-group-bot">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination justify-content-center" id="pagination">
+                            <!-- Các nút phân trang sẽ được tạo ra ở đây -->
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', function() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const groupServiceId = Number(urlParams.get('groupServiceId'));
+        const ratings = /*[[${ratings}]]*/ [];
+        const itemsPerPage = 5;
+        let currentPage = 0;
+
+        // Lọc đánh giá theo groupServiceId hoặc lấy tất cả nếu không có
+        const filteredRatings = groupServiceId ?
+            ratings.filter(rating => rating.groupServiceId === groupServiceId) :
+            ratings;
+
+        const totalPages = Math.ceil(filteredRatings.length / itemsPerPage);
+
+        function displayRatings(page) {
+            const start = page * itemsPerPage;
+            const end = start + itemsPerPage;
+            const ratingsList = document.getElementById('ratings-list');
+            ratingsList.innerHTML = ''; // Xóa danh sách hiện tại
+
+            const currentRatings = filteredRatings.slice(start, end);
+
+            // Cập nhật tổng số đánh giá
+            const totalRatingsElement = document.getElementById('total-ratings');
+            totalRatingsElement.innerText = `${filteredRatings.length} đánh giá`;
+
+            // Kiểm tra xem có đánh giá nào không
+            if (currentRatings.length === 0) {
+                ratingsList.innerHTML = '<li class="text-center">Không có đánh giá nào.</li>';
+                return;
+            }
+
+            currentRatings.forEach(rating => {
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item';
+                listItem.style.background = 'none';
+                listItem.style.border = 'none';
+
+                listItem.innerHTML = `
+                <div class="list-group-vete">
+                    <div class="group-top" style="align-items: normal; display: flex;">
+                        <img src="${rating.userBase64Image}" alt="User Image" class="service-image"
+                             style="margin-right: 15px; border-radius: 75px;
+                             padding-right: 0;
+                             width: 100px; height: 100px;">
+                        <div class="flex-grow-1" style="padding-left: 1rem">
+                            <h5>${rating.userFullName}</h5>
+                            <div class="stars-container" data-rating="${rating.rating}"></div>
+                            <p>${rating.comment}</p>
+                            <img src="${rating.base64Image}" alt="Phòng 101" style="width:auto; height: 200px;">
+                        </div>
+                        <div>
+                            <p class="btn-book-hotel rating-date" data-created-at="${rating.createdAt}"></p>
+                        </div>
+                    </div>
+                    <hr style="margin: 20px 0; border-top: 1px solid #00bbff;">
+                </div>
+            `;
+                ratingsList.appendChild(listItem);
+            });
+
+            updateRatingDates();
+            updateRatingStars();
+        }
+
+        function updateRatingStars() {
+            document.querySelectorAll('.stars-container').forEach(container => {
+                const rating = parseInt(container.getAttribute('data-rating'), 10);
+                displayRatingStars(rating, container);
+            });
+        }
+
+        function displayRatingStars(rating, container) {
+            let starsHTML = '';
+            for (let i = 1; i <= 5; i++) {
+                starsHTML += `<svg style="margin-right: 10px" width="16" height="16" fill="${i <= rating ? '#3cbeee' : '#b8b8b3'}" viewBox="0 0 16 16">
+                <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"></path>
+            </svg>`;
+            }
+            container.innerHTML = starsHTML;
+        }
+
+        function updateRatingDates() {
+            document.querySelectorAll('.rating-date').forEach(item => {
+                const originalDate = item.getAttribute('data-created-at');
+                item.innerText = formatDate(originalDate);
+            });
+        }
+
+        function formatDate(dateString) {
+            const options = { year: 'numeric', month: '2-digit', day: '2-digit' };
+            const date = new Date(dateString);
+            return date.toLocaleDateString('vi-VN', options);
+        }
+
+        function updatePagination() {
+            const pagination = document.getElementById('pagination');
+            pagination.innerHTML = '';
+
+            const prevItem = document.createElement('li');
+            prevItem.className = 'page-item';
+            prevItem.innerHTML = `<a class="page-link" id="prev-page" aria-label="Previous">&laquo;</a>`;
+            pagination.appendChild(prevItem);
+
+            for (let i = 0; i < totalPages; i++) {
+                const pageItem = document.createElement('li');
+                pageItem.className = `page-item ${currentPage === i ? 'active' : ''}`;
+                pageItem.innerHTML = `<a class="page-link" href="#" data-page="${i}">${i + 1}</a>`;
+                pagination.appendChild(pageItem);
+            }
+
+            const nextItem = document.createElement('li');
+            nextItem.className = 'page-item';
+            nextItem.innerHTML = `<a class="page-link" id="next-page" aria-label="Next">&raquo;</a>`;
+            pagination.appendChild(nextItem);
+
+            const prevButton = document.getElementById('prev-page');
+            const nextButton = document.getElementById('next-page');
+
+            if (prevButton) {
+                prevButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (currentPage > 0) {
+                        currentPage--;
+                        displayRatings(currentPage);
+                        updatePagination();
+                    }
+                });
+            }
+
+            if (nextButton) {
+                nextButton.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (currentPage < totalPages - 1) {
+                        currentPage++;
+                        displayRatings(currentPage);
+                        updatePagination();
+                    }
+                });
+            }
+        }
+
+        // Cập nhật tổng số đánh giá khi tải trang
+        const totalRatingsElement = document.getElementById('total-ratings');
+        totalRatingsElement.innerText = `${filteredRatings.length} đánh giá`;
+
+        displayRatings(currentPage);
+        updatePagination();
+    });
+</script>
+
+
+
+<script>
+    function redirectToBooking(button) {
+        const serviceId = button.getAttribute('data-service-id');
+        const serviceName = button.getAttribute('data-service-name');
+        const groupServiceId = button.getAttribute('data-group-service-id');
+
+        window.location.href = `/booking?serviceId=${serviceId}&groupServiceId=${groupServiceId}`;
+    }
+
+    function formatNumber(num) {
+        return parseFloat(num).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+    }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        var priceElements = document.querySelectorAll(".price");
+        priceElements.forEach(function (element) {
+            var price = element.getAttribute("data-price");
+            if (price) {
+                element.textContent = "Giá: " + formatNumber(price) + " VND";
+            }
+        });
+        var priceElements = document.querySelectorAll(".price2");
+        priceElements.forEach(function (element) {
+            var price = element.getAttribute("data-price");
+            if (price) {
+                element.textContent = formatNumber(price) + " VND";
+            }
+        });
+    });
+</script>
+
+<footer th:replace="user/fragment/footer :: footer"></footer>
+<div th:replace="user/fragment/script :: script"></div>
+</body>
+</html>

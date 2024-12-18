@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="user/fragment/head :: head"></head>
+<body>
+<div th:replace="user/fragment/navbar :: navbar"></div>
+<!-- 404 Start -->
+<div class="container-fluid bg-light py-5">
+    <div class="container py-5 text-center">
+        <div class="row justify-content-center">
+            <div class="col-lg-6 wow fadeInUp" data-wow-delay="0.3s">
+                <i class="bi bi-exclamation-triangle display-1 text-primary"></i>
+                <h1 class="mb-4">Thông tin đặt lịch đã được hủy!</h1>
+                <h4 class="mb-4">Cảm ơn bạn đã đến trang web của chúng tôi!</h4>
+                <p class="mb-4">Bạn có thể tham khao các dịch vụ khác của chúng tôi!</p>
+                <a class="btn btn-primary rounded-pill py-3 px-5" th:href="@{/home}">Go Back To Home</a>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- 404 End -->
+
+<footer th:replace="user/fragment/footer :: footer"></footer>
+<div th:replace="user/fragment/script :: script"></div>
+</body>
+
+</html>

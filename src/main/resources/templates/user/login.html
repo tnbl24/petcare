@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pet Care</title>
+    <link rel="stylesheet" th:href="@{/my/css/style.css}">
+    <link rel="shortcut icon" th:href="@{/admin/assets/images/logoPetCare.svg}" type="image/x-icon">
+
+    <script th:src="@{/user/controller/login.js}"></script>
+
+</head>
+<body>
+<div class="wrapper">
+    <div class="tab">
+        <div class="login-tab active" onclick="showLogin()">Đăng Nhập</div>
+    </div>
+
+    <form id="login-form" th:action="@{/login}" method="post">
+        <div th:if="${error}" style="color: red; margin-bottom: 1rem;">
+            <p th:text="${error}"></p>
+        </div>
+        <div th:if="${success}" style="color: green; margin-bottom: 1rem;">
+            <p th:text="${success}"></p>
+        </div>
+
+        <div class="input-field">
+            <input type="text" required name="username">
+            <label>Tên đăng nhập</label>
+        </div>
+        <div class="input-field">
+            <input type="password" required name="password">
+            <label>Mật khẩu</label>
+        </div>
+        <button type="submit">Đăng nhập</button>
+        <p style="margin-top: 1rem">Chưa có tài khoản? <a th:href="@{/register}">Đăng ký</a></p>
+        <p style="margin-top: 1rem"><a th:href="@{/password/forgot}">Quên mật khẩu</a></p>
+    </form>
+</div>
+<script th:src="@{/my/js/sidebar.js}"></script>
+</body>
+</html>
