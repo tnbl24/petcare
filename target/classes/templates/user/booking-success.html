@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="user/fragment/head :: head"></head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        overflow: auto; /* Allow scrolling */
+        height: 100vh; /* Full height */
+        margin: 0; /* Reset margins */
+        background: linear-gradient(90deg, rgba(232, 243, 255, 1) 0%, rgba(215, 242, 250, 1) 51%, rgba(214, 247, 236, 0.6) 100%);
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="date"],
+    input[type="number"],
+    select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+    }
+
+    .form-floating {
+        border: 1px solid #3cbeee;
+        border-radius: 5px;
+    }
+
+    .checkinfo {
+        background: #ffffff91;
+    }
+</style>
+<body>
+<div th:replace="user/fragment/navbar :: navbar"></div>
+<div class="container-fluid contact py-5">
+    <div class="container py-5">
+        <div class="row g-5">
+            <h3 class="text-primary text-center">Đặt dịch vụ thành công</h3>
+            <h6 class="text-center" style="margin: 0">Yêu cầu đặt lịch của bạn đã được nhận và đang chờ xác nhận từ chúng tôi. Chúng tôi sẽ liên hệ lại sớm nhất để xác nhận lịch đặt.</h6>
+            <div class="col-xl-6 wow fadeInUp checkinfo" data-wow-delay="0.4s">
+                <div class="p-5 rounded h-100">
+                    <form>
+                        <div class="row ">
+                            <div class="col-4">
+                                <p>Mã đặt dịch vụ:</p>
+                            </div>
+                            <div class="col-8">
+                                <h5 id="confirmServiceId" th:text="${bookedServiceId}"></h5>
+                            </div>
+                            <div class="col-4">
+                                <p>Đặt vào lúc:</p>
+                            </div>
+                            <div class="col-8">
+                                <h5 id="confirmBookingTime" th:text="${createAt}"></h5>
+                            </div>
+                            <hr class="my-4">
+                            <div class="col-4">
+                                <p>Dịch vụ:</p>
+                            </div>
+                            <div class="col-8">
+                                <h5 id="confirmService" th:text="${serviceName}"></h5>
+                            </div>
+                            <div class="col-4">
+                                <p>Giờ đặt:</p>
+                            </div>
+                            <div class="col-8">
+                                <h5 id="confirmTime" th:text="${bookingTime}"></h5>
+                            </div>
+                            <div class="col-4">
+                                <p>Ngày đặt:</p>
+                            </div>
+                            <div class="col-8">
+                                <h5 id="confirmDate" th:text="${bookingDate}"></h5>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="row ">
+                            <div class="col-4">
+                                <p>Giá tiền:</p>
+                            </div>
+                            <div class="col-8">
+                                <h5 id="servicePrice" th:text="${servicePrice}"></h5>
+                            </div>
+                            <div class="col-4">
+                                <p>Phương thức thanh toán:</p>
+                            </div>
+                            <div class="col-8">
+                                <h5 id="confirmPaymentMethod" th:text="${paymentMethod == 'offline' ? 'Trả tiền mặt' : 'Thanh toán online'}"></h5>
+                            </div>
+                            <div class="col-4">
+                                <p>Ghi chú:</p>
+                            </div>
+                            <div class="col-8">
+                                <h5 id="confirmMessage" th:text="${notes}"></h5>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-xl-6 wow fadeInUp checkinfo" data-wow-delay="0.4s">
+                <div class="p-5 rounded h-100">
+                    <form>
+                        <div class="row ">
+                            <div class="col-4">
+                                <p>Họ và tên:</p>
+                            </div>
+                            <div class="col-8">
+                                <h5 id="confirmCustomerName" th:text="${customerName}"></h5>
+                            </div>
+                            <div class="col-4">
+                                <p>Số điện thoại:</p>
+                            </div>
+                            <div class="col-8">
+                                <h5 id="confirmCustomerPhone" th:text="${customerPhone}"></h5>
+                            </div>
+                            <div class="col-4">
+                                <p>Email:</p>
+                            </div>
+                            <div class="col-8">
+                                <h5 id="confirmCustomerEmail" th:text="${customerEmail}"></h5>
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        <div class="row ">
+                            <div class="col-4">
+                                <p>Tên thú cưng:</p>
+                            </div>
+                            <div class="col-8">
+                                <h5 id="confirmPetName" th:text="${petName}"></h5>
+                            </div>
+                            <div class="col-4">
+                                <p>Tuổi thú cưng:</p>
+                            </div>
+                            <div class="col-8">
+                                <h5 id="confirmPetAge" th:text="${petAge}"></h5>
+                            </div>
+                            <div class="col-4">
+                                <p>Giống:</p>
+                            </div>
+                            <div class="col-8">
+                                <h5 id="confirmPetBreed" th:text="${petBreed}"></h5>
+                            </div>
+                            <div class="col-4">
+                                <p>Cân nặng:</p>
+                            </div>
+                            <div class="col-8">
+                                <h5 id="confirmPetWeight" th:text="${petWeight}"></h5>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="col-12 mt-4 text-center">
+                        <a th:href="@{/home}" class="btn btn-primary w-100 py-3">Trở về trang chủ</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="user/fragment/footer :: footer"></footer>
+<div th:replace="user/fragment/script :: script"></div>
+</body>
+</html>

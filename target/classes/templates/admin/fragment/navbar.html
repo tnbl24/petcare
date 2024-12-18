@@ -1,0 +1,18 @@
+<nav class="navbar navbar-header navbar-expand navbar-light" th:fragment="navbar">
+    <a class="sidebar-toggler" href="#"><span class="navbar-toggler-icon"></span></a>
+    <button class="btn navbar-toggler" type="button" data-toggle="collapse"
+            data-target="#navbarSupportedContent"
+            aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+
+    </button>
+    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav d-flex align-items-center navbar-light ml-auto">
+            <li class="dropdown">
+                    <div class="avatar mr-1">
+                        <a class="dropdown-item" th:href="@{/logout}"><i data-feather="log-out"></i> Đăng xuất</a>
+                    </div>
+            </li>
+        </ul>
+    </div>
+</nav>

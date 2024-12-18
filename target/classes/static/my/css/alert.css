@@ -1,0 +1,37 @@
+.order-last {
+    display: flex;
+    width: 100%;
+    justify-content: space-between;
+}
+
+.alert {
+    min-width: 350px;
+    top: 5rem;
+    border: 1px solid;
+    position: fixed;
+    right: 20px;
+    z-index: 1050;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+.alert {
+    animation: slideIn 0.5s forwards;
+}
+
+/*.alert-light-success
+.alert-light-danger
+.alert-light-info
+.alert-light-secondary
+.alert-light-primary
+.alert-light-warning
+*/

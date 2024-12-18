@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head th:replace="user/fragment/head :: head"></head>
+
+<body>
+<div th:replace="user/fragment/navbar :: navbar"></div>
+
+<style>
+    thead, tbody, tfoot, tr, td, th {
+        border-color: inherit;
+        border-width: 0;
+        border-radius: 8px;
+        border-style: none;
+    }
+
+    thead {
+        text-align: center;
+    }
+
+    .div-group-bot {
+        margin: 10px;
+    }
+
+    .table tbody tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+
+    body {
+        background: linear-gradient(90deg, rgba(232, 243, 255, 1) 0%, rgba(215, 242, 250, 1) 51%, rgba(214, 247, 236, 0.6) 100%);
+    }
+
+    .list-group-item-room {
+        background: white;
+    }
+
+    #starRating .star {
+        margin-right: 5px; /* Khoảng cách giữa các sao */
+    }
+
+    #starRating .star:last-child {
+        margin-right: 0; /* Không có khoảng cách bên phải cho sao cuối cùng */
+    }
+
+    .flex-grow-1 {
+        margin-top: 10px;
+    }
+
+    table {
+        margin-top: 10px;
+        margin-left: 1%;
+    }
+
+    .modal {
+        z-index: 9999999;
+    }
+
+    .alert {
+        position: fixed;
+        top: 5rem;
+        z-index: 1050;
+        right: -100%; /* Bắt đầu bên ngoài màn hình */
+        width: 30%;
+        border-radius: 8px;
+        padding: 15px;
+        margin: 10px 0;
+        display: flex;
+        transition: right 1s ease, opacity 1s ease; /* Hiệu ứng dịch chuyển và mờ */
+        opacity: 1; /* Độ mờ ban đầu */
+    }
+
+    .show-alert {
+        right: 0%; /* Vị trí hiển thị alert */
+    }
+
+    .hide-alert {
+        right: -100%; /* Di chuyển ra ngoài màn hình */
+        opacity: 0; /* Mờ dần */
+    }
+
+    .alert .bi {
+        width: 1.5em;
+        height: 1.5em;
+    }
+
+    .alert div {
+        margin-left: 10px;
+    }
+
+    .alert-success .bi {
+        fill: #0f5132;
+    }
+
+    .alert-danger .bi {
+        fill: #842029;
+    }
+    #modalRatingStars {
+        display: flex;  /* Đảm bảo sao được hiển thị theo hàng */
+        height: auto;   /* Đặt chiều cao tự động */
+        align-items: center;
+    }
+</style>
+
+<div class="container d-flex flex-column">
+    <div class="filter-section wow fadeInUp" style="position: relative" data-wow-delay="0.2s">
+        <form id="searchForm" action="/history" method="get" style="display: flex; justify-content: space-around;">
+            <h2 class="text-center font-weight-bold text-primary mb-4">Lịch sử đặt</h2>
+            <div class="form-group" style="width: 30%">
+                <input type="text" name="bookServiceId" class="form-control" placeholder="Mã đặt lịch (ID)"
+                       th:value="${bookServiceId}">
+            </div>
+            <div class="form-group" style="width: 30%">
+                <select name="serviceId" class="form-control">
+                    <option value="">Chọn loại dịch vụ</option>
+                    <th:block th:each="service : ${services}">
+                        <option th:value="${service.id}" th:text="${service.name}"
+                                th:selected="${service.id == serviceId}"></option>
+                    </th:block>
+                </select>
+            </div>
+            <button type="submit" style="height: 40px" class="btn btn-primary">Tìm Kiếm</button>
+        </form>
+    </div>
+
+    <svg xmlns="http://www.w3.org/2000/svg" class="d-none">
+        <symbol id="check-circle-fill" viewBox="0 0 16 16">
+            <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-3.97-3.03a.75.75 0 0 0-1.08.022L7.477 9.417 5.384 7.323a.75.75 0 0 0-1.06 1.06L6.97 11.03a.75.75 0 0 0 1.079-.02l3.992-4.99a.75.75 0 0 0-.01-1.05z"/>
+        </symbol>
+        <symbol id="exclamation-triangle-fill" viewBox="0 0 16 16">
+            <path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/>
+        </symbol>
+    </svg>
+
+    <div class="alert alert-success alert-dismissible fade show" role="alert" th:if="${successMessage}">
+        <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Success:">
+            <use xlink:href="#check-circle-fill"/>
+        </svg>
+        <div th:text="${successMessage}"></div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" th:if="${errorMessage}">
+        <svg class="bi flex-shrink-0 me-2" role="img" aria-label="Danger:">
+            <use xlink:href="#exclamation-triangle-fill"/>
+        </svg>
+        <div th:text="${errorMessage}"></div>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+
+    <div class="list-group-item-room flex-grow-1 mt-4 wow fadeInUp">
+        <table class="table info-table" style="width: 98%; margin-bottom: 1rem;">
+            <thead class="head-table">
+            <tr>
+                <th>ID</th>
+                <th>DỊCH VỤ</th>
+                <th>NGÀY ĐẶT</th>
+                <th>GIỜ ĐẶT</th>
+                <th>THỜI GIAN ĐẶT</th>
+                <th>GIÁ TIỀN</th>
+                <th>TRẠNG THÁI</th>
+                <th>HOẠT ĐỘNG</th>
+            </tr>
+            </thead>
+            <tbody id="bookedServicesBody">
+            <tr th:each="service : ${bookedServices}">
+                <td class="text-center" th:text="${service.id}"></td>
+                <td th:text="${service.services.name}"></td>
+                <td class="text-center" th:text="${service.bookingDate}"></td>
+                <td class="text-center" th:text="${service.bookingTime}"></td>
+                <td class="text-center" th:text="${#temporals.format(service.createAt, 'HH:mm:ss dd-MM-yyyy')}"></td>
+                <td class="text-center"
+                    th:text="${service.price != null ? T(java.lang.String).format('%,.0f', service.price).replace(',', '.') : '0'} + ' VNĐ'"></td>
+                <td class="text-center">
+                    <span th:if="${service.status == 'confirmed'}" class="badge bg-info">Đã xác nhận</span>
+                    <span th:if="${service.status == 'completed'}" class="badge bg-success">Hoàn thành</span>
+                    <span th:if="${service.status == 'cancelled'}" class="badge bg-danger">Đã hủy</span>
+                    <span th:if="${service.status != 'confirmed' and service.status != 'completed' and service.status != 'cancelled'}"
+                          class="badge bg-warning">Chờ xác nhận</span>
+                </td>
+
+                <td class="text-center">
+                    <div th:if="${service.status == 'completed'}">
+                        <div th:with="statusList=${ratingStatusList}">
+                            <div th:each="status : ${statusList}">
+                                <div th:if="${status.substring(0, status.indexOf(':')).toString() == service.id.toString()}">
+
+                                    <button type="button" class="btn btn-warning"
+                                            th:if="${status.substring(status.indexOf(':') + 1).trim() == 'Không có đánh giá'}"
+                                            data-bs-target="#rateModal1"
+                                            data-bs-toggle="modal"
+                                            th:data-id="${service.id}">Đánh giá
+                                    </button>
+
+                                    <button type="button" class="btn btn-info"
+                                            th:if="${status.substring(status.indexOf(':') + 1).trim() == 'Có đánh giá'}"
+                                            data-bs-target="#viewRatingModal"
+                                            data-bs-toggle="modal"
+                                            th:data-id="${service.id}">Xem đánh giá
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button type="button" class="btn btn-danger"
+                            th:if="${service.status == 'confirmed' || service.status == 'pending'}"
+                            data-bs-target="#deleteModal1"
+                            data-bs-toggle="modal"
+                            th:data-id="${service.id}"
+                    >Hủy
+                    </button>
+                </td>
+            </tr>
+            <tr th:if="${#lists.isEmpty(bookedServices)}">
+                <td colspan="8" class="text-center">Không có dịch vụ nào được tìm thấy.</td>
+            </tr>
+            </tbody>
+        </table>
+        <nav aria-label="Page navigation" th:if="${totalPages > 0}">
+            <ul class="pagination justify-content-center">
+                <li class="page-item" th:classappend="${currentPage == 1} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/history(pageNum=${currentPage - 1}, bookServiceId=${bookServiceId}, serviceId=${serviceId})}"
+                       aria-label="Previous">
+                        <span aria-hidden="true">&laquo;</span>
+                    </a>
+                </li>
+                <li class="page-item" th:each="i : ${#numbers.sequence(1, totalPages)}"
+                    th:classappend="${currentPage == i} ? 'active'">
+                    <a class="page-link"
+                       th:href="@{/history(pageNum=${i}, bookServiceId=${bookServiceId}, serviceId=${serviceId})}"
+                       th:text="${i}"></a>
+                </li>
+                <li class="page-item" th:classappend="${currentPage == totalPages} ? 'disabled'">
+                    <a class="page-link"
+                       th:href="@{/history(pageNum=${currentPage + 1}, bookServiceId=${bookServiceId}, serviceId=${serviceId})}"
+                       aria-label="Next">
+                        <span aria-hidden="true">&raquo;</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+    </div>
+</div>
+
+<div class="modal fade" id="rateModal1" aria-hidden="true" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5 text-center" id="rateModalTitle">Đánh giá</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="ratingForm" method="post" action="/history/{id}/rating" enctype="multipart/form-data">
+                    <input type="hidden" name="serviceId" id="serviceIdToRate">
+                    <div class="mb-3" style="display: flex">
+                        <label class="form-label" style="margin-right: 1rem">Đánh giá của bạn:</label>
+                        <div id="starRating" style="cursor: pointer;"></div>
+                        <input type="hidden" name="rating" id="ratingValue" value="">
+                    </div>
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">Ý kiến của bạn:</label>
+                        <textarea name="comment" id="comment" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="imageUpload" class="form-label">Tải lên ảnh:</label>
+                        <input type="file" id="imageUpload" name="imageFile" class="form-control" accept="image/*">
+                    </div>
+                    <div class="mb-3" id="imagePreviewContainer" style="display: none;">
+                        <img id="imagePreview" src="" alt="Ảnh xem trước" class="img-fluid" style="max-height: 150px;">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-success" id="submitRatingButton">Gửi đánh giá</button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="deleteModal1" aria-hidden="true" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="exampleModalToggleLabel" style="text-align: center">Hủy lịch</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Bạn có chắc muốn hủy lịch <span id="serviceIdToCancel"></span> không?
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-bs-dismiss="modal">Không hủy</button>
+                <form id="cancelServiceForm" method="post" action="#" style="display: inline;">
+                    <input type="hidden" name="serviceId" id="serviceIdInput">
+                    <button type="button" class="btn btn-danger" id="confirmCancelButton">Hủy lịch</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal fade" id="viewRatingModal" aria-hidden="true" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 id="modalBookedServiceId" class="modal-title fs-5 text-center">Đánh giá ID: </h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form enctype="multipart/form-data">
+                    <div class="mb-3" style="display: flex">
+<!--                        <label class="form-label" style="margin-right: 1rem">Đánh giá của bạn:</label>-->
+                        <div id="modalRatingStars" class="d-flex"></div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="comment" class="form-label">Ý kiến của bạn:</label>
+                        <div id="modalCommentValue"></div>
+                    </div>
+                    <div class="mb-3">
+                        <img id="modalRatingImage" src="" alt="Ảnh xem trước" class="img-fluid"
+                             style="max-height: 150px;">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" data-bs-dismiss="modal">Đóng</button>
+            </div>
+        </div>
+    </div>
+</div>
+<footer th:replace="user/fragment/footer :: footer"></footer>
+<div th:replace="user/fragment/script :: script"></div>
+<script>
+    document.querySelectorAll('button[data-bs-toggle="modal"][data-bs-target="#viewRatingModal"]').forEach(button => {
+        button.addEventListener('click', function() {
+            const serviceId = this.getAttribute('data-id'); // Lấy ID dịch vụ từ nút
+
+            fetch(`/history/${serviceId}/ratings`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    document.getElementById('modalBookedServiceId').innerText = `ID Dịch Vụ: ${serviceId}`;
+                    displayRatingStars(data.rating); // Đảm bảo data.rating tồn tại và có giá trị
+                    document.getElementById('modalCommentValue').innerText = data.comment;
+                    document.getElementById('modalRatingImage').src = data.base64Image ? "data:image/png;base64," + data.base64Image : "";
+                })
+                .catch(error => {
+                    console.error('There was a problem with the fetch operation:', error);
+                });
+        });
+    });
+
+    function displayRatingStars(rating) {
+        const starContainer = document.getElementById('modalRatingStars');
+        let starsHTML = '';
+
+        const totalStars = 5; // Tổng số sao
+        for (let i = 1; i <= totalStars; i++) {
+            starsHTML += `<svg style="margin-right: 10px" width="16" height="16" fill="${i <= rating ? '#3cbeee' : '#b8b8b3'}" viewBox="0 0 16 16">
+            <path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"></path>
+        </svg>`;
+        }
+
+        starContainer.innerHTML = starsHTML;
+    }
+</script>
+<script>
+    var deleteModal = document.getElementById('deleteModal1');
+    deleteModal.addEventListener('show.bs.modal', function (event) {
+        var button = event.relatedTarget; // Nút kích hoạt modal
+        var serviceId = button.getAttribute('data-id'); // Lấy ID dịch vụ từ nút
+        console.log('Service ID:', serviceId); // Debug: in ra ID
+        var serviceIdToCancel = deleteModal.querySelector('#serviceIdToCancel');
+        var serviceIdInput = deleteModal.querySelector('#serviceIdInput');
+        serviceIdToCancel.textContent = serviceId; // Hiển thị ID trong modal
+        serviceIdInput.value = serviceId; // Lưu ID vào input ẩn
+    });
+    document.getElementById('confirmCancelButton').addEventListener('click', function () {
+        var form = document.getElementById('cancelServiceForm');
+        var serviceId = document.getElementById('serviceIdInput').value;
+
+        if (serviceId) {
+            form.action = '/history/' + serviceId + '/cancel'; // Cập nhật action
+            form.submit(); // Gửi form
+        } else {
+            alert('ID dịch vụ không hợp lệ.'); // Thông báo nếu không có ID
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const rateModal = document.getElementById('rateModal1');
+        const starRatingContainer = document.getElementById('starRating');
+        const totalStars = 5;
+        const initialStarColor = '#b8b8b3'; // Màu ban đầu của sao
+
+        for (let i = 1; i <= totalStars; i++) {
+            const star = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+            star.setAttribute("class", "star");
+            star.setAttribute("data-value", i);
+            star.setAttribute("width", "16");
+            star.setAttribute("height", "16");
+            star.setAttribute("fill", initialStarColor); // Màu ban đầu
+            star.setAttribute("viewBox", "0 0 16 16");
+            star.innerHTML = `<path d="M3.612 15.443c-.386.198-.824-.149-.746-.592l.83-4.73L.173 6.765c-.329-.314-.158-.888.283-.95l4.898-.696L7.538.792c.197-.39.73-.39.927 0l2.184 4.327 4.898.696c.441.062.612.636.282.95l-3.522 3.356.83 4.73c.078.443-.36.79-.746.592L8 13.187l-4.389 2.256z"/>`;
+            starRatingContainer.appendChild(star);
+        }
+
+        const stars = document.querySelectorAll('.star');
+        stars.forEach(star => {
+            star.addEventListener('click', function () {
+                const rating = this.getAttribute('data-value');
+                document.getElementById('ratingValue').value = rating;
+
+                stars.forEach(s => {
+                    s.setAttribute('fill', s.getAttribute('data-value') <= rating ? '#3cbeee' : initialStarColor);
+                });
+            });
+        });
+
+        rateModal.addEventListener('show.bs.modal', function (event) {
+            const button = event.relatedTarget;
+            const serviceId = button.getAttribute('data-id');
+            document.getElementById('serviceIdToRate').value = serviceId;
+            document.getElementById('ratingValue').value = ''; // Reset rating value
+
+            stars.forEach(s => {
+                s.setAttribute('fill', initialStarColor);
+            });
+
+            document.getElementById('imagePreviewContainer').style.display = 'none';
+            document.getElementById('imagePreview').src = '';
+        });
+
+        const imageUpload = document.getElementById('imageUpload');
+        imageUpload.addEventListener('change', function (event) {
+            const file = event.target.files[0];
+            const imagePreview = document.getElementById('imagePreview');
+            const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    imagePreview.src = e.target.result;
+                    imagePreviewContainer.style.display = 'block'; // Hiện ảnh xem trước
+                };
+                reader.readAsDataURL(file);
+            } else {
+                imagePreviewContainer.style.display = 'none'; // Ẩn ảnh xem trước nếu không có file
+            }
+        });
+
+        document.getElementById('submitRatingButton').addEventListener('click', function () {
+            const form = document.getElementById('ratingForm');
+            if (form.checkValidity()) {
+                form.submit();
+            } else {
+                alert('Vui lòng điền đầy đủ thông tin đánh giá.');
+            }
+        });
+    });
+    const rateModal = document.getElementById('rateModal1');
+    rateModal.addEventListener('show.bs.modal', function (event) {
+        const button = event.relatedTarget; // Nút mở modal
+        const serviceId = button.getAttribute('data-id'); // Lấy ID dịch vụ từ nút
+        document.getElementById('serviceIdToRate').value = serviceId; // Gán giá trị ID vào input ẩn
+
+        const rateModalTitle = document.getElementById('rateModalTitle');
+        rateModalTitle.textContent = 'Đánh giá ' + serviceId;
+        // Cập nhật action của form
+        const form = document.getElementById('ratingForm');
+        form.action = '/history/' + serviceId + '/rating'; // Cập nhật URL
+    });
+</script>
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const alerts = document.querySelectorAll('.alert');
+
+        alerts.forEach(alert => {
+            alert.classList.add('show-alert');
+
+            setTimeout(() => {
+                alert.classList.add('hide-alert');
+                setTimeout(() => {
+                    alert.style.display = 'none';
+                }, 500);
+            }, 3500);
+        });
+    });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="admin/fragment/head :: head"></head>
+<script th:src="@{/admin/controller/blog-create-ctrl.js}"></script>
+
+<body>
+<div id="app">
+    <div th:replace="admin/fragment/sidebar :: sidebar"></div>
+    <div id="main">
+        <div th:replace="admin/fragment/navbar :: navbar"></div>
+        <div class="main-content container-fluid">
+            <div class="page-title">
+                <div class="row">
+                    <div class="col-12 col-md-6 order-md-1 order-last">
+                        <h3>Tạo bài viết</h3>
+                        <div id="alert" class="alert alert-secondary alert-dismissible fade" style="display: none;">
+                            This is a secondary alert.
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="table-head">
+                <div class="dataTable-search">
+                    <!-- Search input can go here -->
+                </div>
+                <div class="text-right">
+                    <button class="btn btn-green" id="submitBtn" data-toggle="modal" data-target="#create-service-detail" onclick="createBlog()">Thêm mới
+                    </button>
+                </div>
+            </div>
+
+            <form action="#" id="update-service-form">
+                <div class="modal-body">
+                    <div class="mb-1">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Tiêu đề</span>
+                            <input type="text" class="form-control" id="title" name="name" required aria-label="Sizing example input">
+                        </div>
+                    </div>
+                    <div class="input-group mb-3">
+                        <span class="form-file-button input-group-text">Hình ảnh</span>
+                        <div class="form-file">
+                            <input type="file"
+                                   class="form-file-input"
+                                   name="imageFile"
+                                   id="imageFile"
+                                   accept="image/*"
+                                   onchange="previewImage(event)">
+                            <label class="form-file-label">
+                                <span class="form-file-text">Choose file...</span>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="mb-1">
+                        <img class="image-preview" src="path/to/default/image.png" alt="Hình ảnh dịch vụ" style="width: 100px; height: 100px; display: none; margin-top: 10px;">
+                    </div>
+                    <section class="section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title">Mô tả</h4>
+                            </div>
+                            <div class="card-body">
+                                <div id="snow2"
+                                     class="form-control"
+                                     contenteditable="true"
+                                     style="min-height: 100px; border: 1px solid #ced4da;">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <section class="section">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4 class="card-title">Bài viết chi tiết</h4>
+                            </div>
+                            <div class="card-body">
+                                <div id="full2" contenteditable="true" class="form-control" style="min-height: 200px; border: 1px solid #ced4da;">
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="admin/fragment/script :: script"></div>
+</body>
+</html>

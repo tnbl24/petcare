@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="admin/fragment/head :: head"></head>
+
+<script th:src="@{/admin/controller/group-service-ctrl.js}"></script>
+
+<body>
+<div id="app">
+    <div th:replace="admin/fragment/sidebar :: sidebar"></div>
+    <div id="main">
+        <div th:replace="admin/fragment/navbar :: navbar"></div>
+        <div class="main-content container-fluid">
+            <div class="page-title">
+                <div class="row">
+                    <div class="col-12 col-md-6 order-md-1 order-last">
+                        <h3>Quản lý loại dịch vụ</h3>
+
+                        <div id="alert" class="alert alert-secondary alert-dismissible fade"
+                             style="display: none; ">
+                            This is a secondary alert.
+                            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true">×</span>
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-head">
+                <div class="dataTable-search">
+                    <input class="dataTable-input" placeholder=" Search..." type="text">
+                </div>
+                <div class="text-right">
+                    <button class="btn btn-green"
+                            data-toggle="modal"
+                            data-target="#create-group-service"
+                    >Thêm mới
+                    </button>
+                </div>
+            </div>
+            <!-- Hoverable rows start -->
+            <div class="row" id="table-hover-row">
+                <div class="col-12">
+                    <div class="card">
+                        <div class="card-content">
+                            <!-- table hover -->
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead>
+                                    <tr>
+                                        <th class="text-center">STT</th>
+                                        <th class="text-center">TÊN LOẠI DỊCH VỤ</th>
+                                        <th class="text-center">HÀNH ĐỘNG</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="groupServiceBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        <ul class="pagination pagination-primary float-right dataTable-pagination" id="pagination"
+                            style="justify-content: center;margin-top: 1rem">
+                            <li class="page-item pager"><a href="#" class="page-link" data-page="1">‹</a></li>
+                            <li class="page-item"><a href="#" class="page-link" data-page="1">1</a></li>
+                            <li class="page-item"><a href="#" class="page-link" data-page="2">2</a></li>
+                            <li class="page-item"><a href="#" class="page-link" data-page="3">3</a></li>
+                            <li class="page-item"><a href="#" class="page-link" data-page="4">4</a></li>
+                            <li class="page-item active"><a href="#" class="page-link" data-page="5">5</a></li>
+                            <li class="page-item"><a href="#" class="page-link" data-page="6">6</a></li>
+                            <li class="page-item pager"><a href="#" class="page-link" data-page="6">›</a></li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+            <!-- Hoverable rows end -->
+        </div>
+    </div>
+</div>
+
+<!--edit form Modal -->
+<div class="modal fade text-left" id="edit-group-service" tabindex="-1"
+     style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Cập Nhật Loại Dịch Vụ </h4>
+            </div>
+            <form action="#">
+                <div class="modal-body">
+                    <div class=" mb-1">
+                        <div class="input-group mb-3">
+                            <input type="hidden" id="editGroupServiceId">
+                            <span class="input-group-text">Tên loại dịch vụ</span>
+                            <input type="text"
+                                   class="form-control"
+                                   aria-label="Sizing example input"
+                                   id="editGroupServiceName">
+                        </div>
+                    </div>
+
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+                        <i class="bx bx-x d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Đóng</span>
+                    </button>
+                    <button type="button"
+                            class="btn btn-green ml-1"
+                            data-dismiss="modal"
+                            onclick="updateGroupService()">
+                        <i class="bx bx-check d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Cập nhật</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!--create form Modal -->
+<div class="modal fade text-left" id="create-group-service" tabindex="-1" style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Thêm Mới Loại Dịch Vụ</h4>
+            </div>
+
+            <form id="createGroupServiceForm">
+                <div class="modal-body">
+                    <div class="mb-1">
+                        <div class="input-group mb-3">
+                            <span class="input-group-text">Tên loại dịch vụ</span>
+                            <input type="text" id="newGroupServiceName" class="form-control"
+                                   aria-label="Sizing example input" required>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+                        <i class="bx bx-x d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Đóng</span>
+                    </button>
+                    <button type="submit" class="btn btn-green ml-1"
+                    onclick="createGroupService()">
+                        <i class="bx bx-check d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Thêm Mới</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- form Modal -->
+<div class="modal fade text-left" id="delete-group-service" tabindex="-1"
+     style="display: none;" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title">Xóa Loại Dịch Vụ </h4>
+            </div>
+            <form action="#">
+                <div class="modal-body">
+                    <div class=" mb-1">
+                        <h6>Bạn có chắc muốn xóa loại dịch vụ <span style="font-size: 25px"
+                                                                    id="groupServiceNameToDelete"></span> không?</h6>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-danger" data-dismiss="modal">
+                        <i class="bx bx-x d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Đóng</span>
+                    </button>
+                    <button type="button"
+                            class="btn btn-green ml-1"
+                            data-dismiss="modal"
+                            id="confirmDeleteButton">
+                        <i class="bx bx-check d-block d-sm-none"></i>
+                        <span class="d-none d-sm-block">Xóa</span>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div th:replace="admin/fragment/script :: script"></div>
+
+
+</body>
+</html>

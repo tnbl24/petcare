@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head th:replace="user/fragment/head :: head"></head>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        overflow: auto; /* Allow scrolling */
+        height: 100vh; /* Full height */
+        margin: 0; /* Reset margins */
+        background: linear-gradient(90deg, rgba(232, 243, 255, 1) 0%, rgba(215, 242, 250, 1) 51%, rgba(214, 247, 236, 0.6) 100%);
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    input[type="text"],
+    input[type="email"],
+    input[type="tel"],
+    input[type="date"],
+    input[type="number"],
+    select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #3cbeee;
+        border-radius: 4px;
+    }
+
+    .form-floating {
+        border: 1px solid #3cbeee;
+        border-radius: 5px;
+    }
+
+    .checkinfo {
+        background: #ffffff91;
+    }
+</style>
+<script>
+    window.onload = function () {
+        const timeSelect = document.getElementById('time');
+        const startHour = 9;
+        const endHour = 17;
+
+        for (let hour = startHour; hour <= endHour; hour++) {
+            const displayHour = hour < 10 ? `0${hour}:00` : `${hour}:00`;
+            const option = document.createElement('option');
+            option.value = displayHour;
+            option.textContent = displayHour;
+            timeSelect.appendChild(option);
+        }
+
+        const urlParams = new URLSearchParams(window.location.search);
+        const serviceId = urlParams.get('serviceId');
+        const groupServiceId = urlParams.get('groupServiceId');
+
+        if (serviceId) {
+            document.getElementById('serviceSelect').value = serviceId;
+            updateInfo();
+            updateServicePrice();
+        }
+
+        if (groupServiceId) {
+            document.getElementById('groupServiceSelect').value = groupServiceId;
+            const event = new Event('change');
+            document.getElementById('groupServiceSelect').dispatchEvent(event);
+        }
+
+        document.getElementById('groupServiceSelect').addEventListener('change', function () {
+            const selectedGroupId = this.value;
+            const allServices = document.querySelectorAll('.service-option');
+
+            allServices.forEach(service => {
+                service.style.display = 'none';
+            });
+
+            if (selectedGroupId) {
+                const selectedServices = document.querySelectorAll(`.service-option[data-group-id="${selectedGroupId}"]`);
+                selectedServices.forEach(service => {
+                    service.style.display = 'block';
+                });
+            } else {
+                allServices.forEach(service => {
+                    service.style.display = 'block';
+                });
+            }
+        });
+
+        document.getElementById('serviceSelect').addEventListener('change', function () {
+            updateInfo();
+            updateServicePrice();
+        });
+
+        document.getElementById('petWeight').addEventListener('input', function () {
+            updateInfo();
+            updateServicePrice();
+        });
+
+        checkFormValidity();
+
+        const inputFields = document.querySelectorAll('input, select, textarea');
+        inputFields.forEach(field => {
+            field.addEventListener('input', () => {
+                updateInfo();
+                checkFormValidity();
+            });
+        });
+
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        const tomorrowString = tomorrow.toISOString().split('T')[0];
+
+        document.getElementById('checkIn').setAttribute('min', tomorrowString);
+
+        document.getElementById('serviceSelect').addEventListener('change', function () {
+            const selectedDate = document.getElementById('checkIn').value; // Lấy ngày đã chọn
+            const selectedServiceId = this.value; // Lấy ID dịch vụ đã chọn
+            resetTimeInput(); // Reset ô input giờ
+
+            if (selectedDate) {
+                checkAvailability(selectedDate, selectedServiceId);
+            }
+        });
+
+        document.getElementById('checkIn').addEventListener('change', function () {
+            const selectedDate = this.value;
+            const selectedServiceId = document.getElementById('serviceSelect').value; // Lấy ID dịch vụ đã chọn
+            resetTimeInput(); // Reset ô input giờ
+
+            if (selectedServiceId) {
+                checkAvailability(selectedDate, selectedServiceId);
+            }
+        });
+
+        function checkAvailability(selectedDate, selectedServiceId) {
+            const url = new URL('/admin/booked-service-ctrl/all', window.location.origin);
+            url.searchParams.append('date', selectedDate);
+            url.searchParams.append('serviceId', selectedServiceId);
+
+            fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Data received:', data); // Thêm dòng này để kiểm tra dữ liệu
+                    hideUnavailableTimes(data, selectedServiceId);
+                })
+                .catch(error => console.error('Error fetching bookings:', error));
+        }
+
+        function hideUnavailableTimes(bookings, selectedServiceId) {
+            if (!Array.isArray(bookings)) {
+                console.error('Bookings is not an array:', bookings);
+                return; // Thoát nếu không phải là mảng
+            }
+
+            const timeOptions = document.querySelectorAll('#time option');
+            const maxBookings = 1; // Giới hạn số lượng đặt
+            const hourCounts = {};
+
+            bookings.forEach(booking => {
+                const bookingDate = booking.bookingDate; // Lấy ngày đặt
+                const bookingTime = booking.bookingTime; // Lấy giờ đặt
+                const hour = new Date(`${bookingDate}T${bookingTime}`).getHours(); // Tạo đối tượng Date để lấy giờ
+                const status = booking.status; // Trạng thái của lịch
+                const serviceId = booking.serviceId; // ID dịch vụ
+
+                if ((status === 'completed' || status === 'pending') && serviceId == selectedServiceId) {
+                    const key = `${bookingDate}-${hour}`;
+                    if (!hourCounts[key]) {
+                        hourCounts[key] = 0;
+                    }
+                    hourCounts[key]++;
+                }
+            });
+
+            timeOptions.forEach(option => {
+                const hourValue = parseInt(option.value.split(':')[0], 10);
+                const selectedDate = document.getElementById('checkIn').value; // Lấy ngày đã chọn
+                const key = `${selectedDate}-${hourValue}`; // Tạo khóa cho ngày và giờ
+
+                if (hourCounts[key] >= maxBookings) {
+                    option.style.display = 'none';
+                } else {
+                    option.style.display = 'block'; // Hiện giờ nếu chưa đạt giới hạn
+                }
+            });
+        }
+
+        function resetTimeInput() {
+            const timeSelect = document.getElementById('time');
+            timeSelect.value = timeSelect.options[0].value; // Đặt về giá trị đầu tiên
+        }
+    };
+
+    function updateInfo() {
+        document.getElementById('confirmCustomerName').innerText = document.getElementById('customerName').value;
+
+        var customerPhone = document.getElementById('customerPhone').value;
+        if (customerPhone.trim() === '') {
+            document.getElementById('confirmCustomerPhone').innerText = document.getElementById('customerPhone').value;
+        } else if (isValidPhoneNumber(customerPhone)) {
+            document.getElementById('confirmCustomerPhone').innerText = customerPhone;
+        } else {
+            document.getElementById('confirmCustomerPhone').innerText = 'Số điện thoại không hợp lệ';
+        }
+
+        var customerEmail = document.getElementById('customerEmail').value;
+        if (customerEmail.trim() === '') {
+            document.getElementById('confirmCustomerEmail').innerText = document.getElementById('customerEmail').value;
+        } else if (isValidEmail(customerEmail)) {
+            document.getElementById('confirmCustomerEmail').innerText = customerEmail;
+        } else {
+            document.getElementById('confirmCustomerEmail').innerText = 'Email không hợp lệ';
+        }
+
+        document.getElementById('confirmPetName').innerText = document.getElementById('petName').value;
+        document.getElementById('confirmPetAge').innerText = document.getElementById('petAge').value;
+        document.getElementById('confirmPetBreed').innerText = document.getElementById('petBreed').value;
+        document.getElementById('confirmPetWeight').innerText = document.getElementById('petWeight').value;
+
+        const serviceSelect = document.getElementById('serviceSelect');
+        const selectedService = serviceSelect.options[serviceSelect.selectedIndex];
+        document.getElementById('confirmService').innerText = selectedService.text;
+        document.getElementById('serviceId').value = selectedService.value;
+
+        document.getElementById('confirmTime').innerText = document.getElementById('time').value;
+        document.getElementById('confirmDate').innerText = document.getElementById('checkIn').value;
+
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        if (paymentMethod === 'offline') {
+            document.getElementById('confirmPaymentMethod').innerText = 'Trả tiền mặt';
+        } else if (paymentMethod === 'online') {
+            document.getElementById('confirmPaymentMethod').innerText = 'Thanh toán online';
+        } else {
+            document.getElementById('confirmPaymentMethod').innerText = paymentMethod;
+        }
+
+        document.getElementById('confirmMessage').innerText = document.getElementById('message').value;
+    }
+
+    function checkFormValidity() {
+        const customerName = document.getElementById('customerName').value.trim();
+        const customerPhone = document.getElementById('customerPhone').value.trim();
+        const customerEmail = document.getElementById('customerEmail').value.trim();
+        const petName = document.getElementById('petName').value.trim();
+        const petAge = document.getElementById('petAge').value.trim();
+        const petBreed = document.getElementById('petBreed').value.trim();
+        const petWeight = document.getElementById('petWeight').value.trim();
+        const selectedService = document.getElementById('serviceSelect').value;
+        const paymentMethod = document.getElementById('paymentMethod').value;
+        const checkInDate = document.getElementById('checkIn').value.trim();
+        const selectedTime = document.getElementById('time').value.trim();
+
+        const isFormValid = customerName && customerPhone && customerEmail && petName && petAge && petBreed && petWeight &&
+            selectedService && paymentMethod && checkInDate && selectedTime;
+
+        document.getElementById('confirmButton').disabled = !isFormValid;
+    }
+
+    function updateServicePrice() {
+        const serviceSelect = document.getElementById('serviceSelect');
+        const selectedService = serviceSelect.options[serviceSelect.selectedIndex];
+        const petWeight = parseFloat(document.getElementById('petWeight').value) || 0;
+
+        if (selectedService) {
+            const hasDetail = selectedService.getAttribute('data-has-detail');
+            let servicePrice = 0;
+
+            if (hasDetail === "1") {
+                const priceDetailsString = selectedService.getAttribute('data-price-details');
+                let priceDetails = [];
+
+                if (priceDetailsString) {
+                    try {
+                        let cleanedPriceDetailsString = priceDetailsString
+                            .replace(/ServiceDetail\(/g, '{"')
+                            .replace(/, /g, '", "')
+                            .replace(/=/g, '": "')
+                            .replace(/\)/g, '"}')
+                            .replace(/services: null/g, '"services": null');
+
+                        cleanedPriceDetailsString = cleanedPriceDetailsString
+                            .replace(/(?<=})", "/g, '", "')
+                            .replace(/"\{"/g, '{"')
+                            .replace(/"}"/g, '"}');
+
+                        const jsonArrayString = `[${cleanedPriceDetailsString}]`;
+
+                        priceDetails = JSON.parse(jsonArrayString);
+                    } catch (e) {
+                        console.error("Error parsing price details:", e);
+                    }
+                }
+
+                let foundPrice = false;
+                if (priceDetails && Array.isArray(priceDetails)) {
+                    if (Array.isArray(priceDetails[0])) {
+                        priceDetails = priceDetails[0];
+                    }
+                    for (const detail of priceDetails) {
+                        if (detail.weight) {
+                            const weightRanges = detail.weight.split('-');
+                            console.log(`Đang kiểm tra weight: ${detail.weight} cho petWeight=${petWeight}`);
+
+                            if (weightRanges.length === 2) {
+                                const minWeight = parseFloat(weightRanges[0]);
+                                const maxWeight = parseFloat(weightRanges[1]);
+                                console.log(`minWeight=${minWeight}, maxWeight=${maxWeight}`);
+
+                                if (petWeight >= minWeight && petWeight <= maxWeight) {
+                                    servicePrice = parseFloat(detail.price);
+                                    foundPrice = true;
+                                    break;
+                                }
+                            } else if (weightRanges.length === 1) {
+                                const singleWeight = parseFloat(weightRanges[0]);
+                                console.log(`Kiểm tra nếu petWeight > ${singleWeight}`);
+                                if (petWeight > singleWeight) {
+                                    servicePrice = parseFloat(detail.price);
+                                    foundPrice = true;
+                                    break;
+                                }
+                            } else {
+                                console.warn("Định dạng weight không hợp lệ:", detail.weight);
+                            }
+                        } else {
+                            console.log("detail.weight", detail.weight);
+                            console.warn("Chi tiết weight không hợp lệ:", detail);
+                        }
+                    }
+                } else {
+                    console.warn("priceDetails không phải là một mảng hợp lệ", priceDetails);
+                }
+
+                if (!foundPrice) {
+                    servicePrice = 0;
+                }
+            } else {
+                servicePrice = parseFloat(selectedService.getAttribute('data-price')) || 0;
+            }
+
+            const formattedPrice = servicePrice.toLocaleString('vi-VN');
+            document.getElementById('confirmPayment').innerText = `${formattedPrice} VNĐ`;
+        } else {
+            document.getElementById('confirmPayment').innerText = '0 VNĐ';
+        }
+    }
+
+    function isValidPhoneNumber(phone) {
+        const phonePattern = /^\d{10,15}$/;
+        return phonePattern.test(phone);
+    }
+
+    function isValidEmail(email) {
+        const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailPattern.test(email);
+    }
+
+
+
+    function submitConfirmation(event) {
+        const priceString = document.getElementById('confirmPayment').innerText;
+        const cleanedPriceString = priceString.replace(/[^\d]/g, "");
+        const price = parseFloat(cleanedPriceString);
+
+        const confirmationData = {
+            fullName: document.getElementById('confirmCustomerName').innerText,
+            phoneNumber: document.getElementById('confirmCustomerPhone').innerText,
+            email: document.getElementById('confirmCustomerEmail').innerText,
+            petName: document.getElementById('confirmPetName').innerText,
+            petAge: document.getElementById('confirmPetAge').innerText,
+            petType: document.getElementById('confirmPetBreed').innerText,
+            petWeight: document.getElementById('confirmPetWeight').innerText,
+            paymentMethod: document.getElementById('paymentMethod').value,
+            notes: document.getElementById('confirmMessage').innerText,
+            price: price,
+            serviceId: document.getElementById('serviceId').value,
+            bookingDate: document.getElementById('confirmDate').innerText,
+            bookingTime: document.getElementById('confirmTime').innerText
+        };
+
+        console.log(confirmationData);
+
+        const hiddenForm = document.createElement('form');
+        hiddenForm.method = 'POST';
+        hiddenForm.action = '/confirm-booking';
+
+        Object.keys(confirmationData).forEach(key => {
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = key;
+            input.value = confirmationData[key];
+            hiddenForm.appendChild(input);
+        });
+
+        document.body.appendChild(hiddenForm);
+        hiddenForm.submit();
+    }
+</script>
+<body>
+<div th:replace="user/fragment/navbar :: navbar"></div>
+
+<div class="container-fluid contact py-5">
+    <div class="container py-5">
+        <div class="row g-5">
+            <div class="col-xl-6 wow fadeInUp" data-wow-delay="0.4s">
+                <div class="p-5 rounded h-100">
+                    <h4 class="text-primary mb-4">Đặt lịch hẹn</h4>
+                    <form id="booking-form" action="/booking" method="post">
+                        <div class="row g-3">
+                            <h5>Dịch vụ:</h5>
+
+                            <div class="form-group col-12">
+                                <select class="form-select form-floating " id="groupServiceSelect" name="groupService"
+                                        required>
+                                    <option value="">Chọn nhóm dịch vụ</option>
+                                    <th:block th:each="groupService : ${groupServices}">
+                                        <option th:value="${groupService.id}" th:text="${groupService.name}"></option>
+                                    </th:block>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-12">
+                                <select class="form-select form-floating" id="serviceSelect" name="serviceId" required>
+                                    <option value="">Chọn dịch vụ</option>
+                                    <th:block th:each="service : ${services}">
+                                        <option th:value="${service.id}" th:text="${service.name}"
+                                                class="service-option"
+                                                th:attr="data-group-id=${service.groupService.id},
+                                                         data-price=${service.price},
+                                                         data-has-detail=${service.hasDetail},
+                                                         data-price-details=${service.serviceDetails}"></option>
+                                    </th:block>
+                                </select>
+                            </div>
+
+                            <div class="form-group col-xl-6 ">
+                                <label for="checkIn" class="cach1 ">Ngày:</label>
+                                <input type="date" class="form-control form-floating " id="checkIn" name="checkIn"
+                                       required>
+                            </div>
+                            <div class="form-group col-xl-6">
+                                <label for="time" class="cach1">Giờ:</label>
+                                <select class="form-select form-floating " id="time" name="time" required>
+                                    <option value="">Chọn giờ</option>
+                                </select>
+                            </div>
+
+                            <h5>Khách hàng:</h5>
+                            <div class="col-lg-12 col-xl-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control border-0" id="customerName"
+                                           name="customerName" placeholder="Họ và tên" required>
+                                    <label for="customerName">Họ và tên</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-xl-6">
+                                <div class="form-floating">
+                                    <input type="tel" class="form-control border-0" id="customerPhone"
+                                           name="customerPhone" placeholder="Số điện thoại" required>
+                                    <label for="customerPhone">Số điện thoại</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 ">
+                                <div class="form-floating">
+                                    <input type="email" class="form-control border-0" id="customerEmail"
+                                           name="customerEmail" placeholder="Your Email" required>
+                                    <label for="customerEmail">Email</label>
+                                </div>
+                            </div>
+                            <h5>Thú cưng:</h5>
+                            <div class="col-lg-12 col-xl-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control border-0" id="petName" name="petName"
+                                           placeholder="Tên" required>
+                                    <label for="petName">Tên</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-xl-6">
+                                <div class="form-floating">
+                                    <input type="number" class="form-control border-0" id="petAge" name="petAge"
+                                           placeholder="Tuổi" required>
+                                    <label for="petAge">Tuổi</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-xl-6">
+                                <div class="form-floating">
+                                    <input type="text" class="form-control border-0" id="petBreed" name="petType"
+                                           placeholder="Giống" required>
+                                    <label for="petBreed">Giống</label>
+                                </div>
+                            </div>
+                            <div class="col-lg-12 col-xl-6">
+                                <div class="form-floating">
+                                    <input type="number" class="form-control border-0" id="petWeight" name="petWeight"
+                                           placeholder="Cân nặng" required>
+                                    <label for="petWeight">Cân nặng</label>
+                                </div>
+                            </div>
+                            <div class="form-group col-12">
+                                <select class="form-select form-floating " id="paymentMethod" name="paymentMethod"
+                                        required>
+                                    <option value="">Chọn phương thức thanh toán</option>
+                                    <option value="online">Thanh toán online</option>
+                                    <option value="offline">Trả tiền mặt</option>
+                                </select>
+                            </div>
+                            <div class="col-12">
+                                <div class="form-floating">
+                                    <textarea class="form-control border-0" placeholder="Ghi chú" id="message"
+                                              name="message" style="height: 160px"></textarea>
+                                    <label for="message">Ghi chú</label>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="col-xl-6 wow fadeInUp checkinfo" data-wow-delay="0.4s">
+                <div class="p-5 rounded h-100">
+                    <h4 class="text-primary mb-4">Xác nhận lại thông tin</h4>
+                    <form>
+                        <div class="row">
+                            <div class="col-4"><p>Dịch vụ:</p></div>
+                            <div class="col-8"><h5 id="confirmService"></h5></div>
+                            <div class="hidden" id="serviceId"> </div>
+                            <div class="col-4"><p>Giờ đặt:</p></div>
+                            <div class="col-8"><h5 id="confirmTime"></h5></div>
+                            <div class="col-4"><p>Ngày đặt:</p></div>
+                            <div class="col-8"><h5 id="confirmDate"></h5></div>
+                        </div>
+                        <hr class="my-4">
+                        <div class="row">
+                            <div class="col-4"><p>Họ và tên:</p></div>
+                            <div class="col-8"><h5 id="confirmCustomerName"></h5></div>
+                            <div class="col-4"><p>Số điện thoại:</p></div>
+                            <div class="col-8"><h5 id="confirmCustomerPhone"></h5></div>
+                            <div class="col-4"><p>Email:</p></div>
+                            <div class="col-8"><h5 id="confirmCustomerEmail"></h5></div>
+                        </div>
+                        <hr class="my-4">
+                        <div class="row">
+                            <div class="col-4"><p>Tên thú cưng:</p></div>
+                            <div class="col-8"><h5 id="confirmPetName"></h5></div>
+                            <div class="col-4"><p>Tuổi thú cưng:</p></div>
+                            <div class="col-8"><h5 id="confirmPetAge"></h5></div>
+                            <div class="col-4"><p>Giống:</p></div>
+                            <div class="col-8"><h5 id="confirmPetBreed"></h5></div>
+                            <div class="col-4"><p>Cân nặng:</p></div>
+                            <div class="col-8"><h5 id="confirmPetWeight"></h5></div>
+                        </div>
+                        <hr class="my-4">
+                        <div class="row">
+                            <div class="col-4"><p>Giá tiền:</p></div>
+                            <div class="col-8"><h5 id="confirmPayment"></h5></div>
+                            <div class="col-4"><p>Phương thức thanh toán:</p></div>
+                            <div class="col-8"><h5 id="confirmPaymentMethod"></h5></div>
+                            <div class="col-4"><p>Ghi chú:</p></div>
+                            <div class="col-8"><h5 id="confirmMessage"></h5></div>
+                        </div>
+                        <div class="col-12 mt-4">
+                            <button onclick="submitConfirmation(event)" id="confirmButton" type="button" class="btn btn-primary w-100 py-3" disabled>
+                                Xác nhận và Thanh toán
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer th:replace="user/fragment/footer :: footer"></footer>
+<div th:replace="user/fragment/script :: script"></div>
+</body>
+</html>

@@ -1,0 +1,69 @@
+<div id="sidebar" class='active' th:fragment="sidebar">
+    <div class="sidebar-wrapper active">
+        <div class="sidebar-header" style="display: flex">
+            <img th:src="@{/admin/assets/images/logoPetCare.svg}" alt="" srcset=""
+                 style="width: 60px; height: auto;margin-right: 10px">
+            <h2 style="display: flex;align-items: center;margin-bottom: 0;">Pet Care</h2>
+        </div>
+        <div class="sidebar-menu">
+            <ul class="menu">
+
+                <li class="sidebar-item">
+                    <a th:href="@{/admin}" class='sidebar-link'>
+                        <i data-feather="home" width="20"></i>
+                        <span>Dashboard</span>
+                    </a>
+                </li>
+                <li class="sidebar-item  ">
+                    <a th:href="@{/admin/booked-service}" class='sidebar-link'>
+                        <i data-feather="calendar" width="20"></i>
+                        <span>Quản lý lịch hẹn</span>
+                    </a>
+
+                </li>
+                <li class="sidebar-item  ">
+                    <a th:href="@{/admin/service-detail}" class='sidebar-link'>
+                        <i data-feather="gitlab" width="20"></i>
+                        <span>Quản lý chi tiết dịch vụ</span>
+                    </a>
+
+                </li>
+                <li class="sidebar-item  ">
+                    <a th:href="@{/admin/service}" class='sidebar-link'>
+                        <i data-feather="gitlab" width="20"></i>
+                        <span>Quản lý dịch vụ</span>
+                    </a>
+
+                </li>
+                <li class="sidebar-item  ">
+                    <a th:href="@{/admin/group-service}" class='sidebar-link'>
+                        <i data-feather="gitlab" width="20"></i>
+                        <span>Quản lý loại dịch vụ</span>
+                    </a>
+
+                </li>
+
+                <li class="sidebar-item  ">
+                    <a th:href="@{/admin/user-account}" class='sidebar-link'>
+                        <i data-feather="user" width="20"></i>
+                        <span>Quản lý tài khoản người dùng</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-item  ">
+                    <a th:href="@{/admin/blog}" class='sidebar-link'>
+                        <i data-feather="file" width="20"></i>
+                        <span>Quản lý bài viết</span>
+                    </a>
+                </li>
+<!--                <li class="sidebar-item  ">-->
+<!--                    <a href="#" class='sidebar-link'>-->
+<!--                        <i data-feather="message-square" width="20"></i>-->
+<!--                        <span>Chat</span>-->
+<!--                    </a>-->
+<!--                </li>-->
+            </ul>
+        </div>
+        <button class="sidebar-toggler btn x"><i data-feather="x"></i></button>
+    </div>
+</div>
